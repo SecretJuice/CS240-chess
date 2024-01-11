@@ -1,6 +1,9 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -30,6 +33,7 @@ public class ChessPiece {
         PAWN
     }
 
+
     /**
      * @return Which team this chess piece belongs to
      */
@@ -54,7 +58,53 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+//        throw new RuntimeException("Not implemented");
+
+        switch (_type){
+            case PieceType.BISHOP -> bishopMoves(board, myPosition);
+            case PieceType.ROOK -> rookMoves(board, myPosition);
+        }
+
         throw new RuntimeException("Not implemented");
+    }
+
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+//        throw new RuntimeException("Not implemented");
+
+        List<ChessMove> validMoves = new ArrayList<>();
+
+        int iterations = 0;
+        ChessPiece checkedPiece;
+
+        // Upper-Right direction
+        iterations = Math.min(7 - myPosition.getRow(), 7 - myPosition.getColumn());
+        for (int i = 1; i <= iterations; i++){
+            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
+            checkedPiece = board.getPiece(checkedPosition);
+
+            ChessMove move = new ChessMove(myPosition, checkedPosition, null);
+
+            if(checkedPiece == null){
+                validMoves.add(move);
+                continue;
+            }
+
+            if(checkedPiece.getTeamColor() != _color){
+                validMoves.add(move);
+            }
+
+            break;
+        }
+
+        return validMoves;
+    }
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    private boolean checkEnemyColor(ChessPiece piece){
+
+        return piece.getTeamColor() != _color;
 
     }
 }
