@@ -187,10 +187,10 @@ public class ChessPiece {
         validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, 1));
         validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, -1));
 
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 1));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, -1));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, 1));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, -1));
 
         return validMoves;
     }
