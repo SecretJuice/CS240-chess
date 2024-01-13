@@ -9,13 +9,13 @@ package chess;
 public class ChessMove {
 
     private ChessPosition _startPos;
-    private ChessPosition _endPost;
+    private ChessPosition _endPos;
     private ChessPiece.PieceType _promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         _startPos = startPosition;
-        _endPost = endPosition;
+        _endPos = endPosition;
         _promotionPiece = promotionPiece;
     }
 
@@ -32,7 +32,7 @@ public class ChessMove {
      */
     public ChessPosition getEndPosition() {
 //        throw new RuntimeException("Not implemented");
-        return _endPost;
+        return _endPos;
     }
 
     /**
@@ -45,4 +45,11 @@ public class ChessMove {
 //        throw new RuntimeException("Not implemented");
         return _promotionPiece;
     }
+
+    public String toString(){
+        return String.format("[%d,%d] -> [%d,%d]", _startPos.getRow(), _startPos.getColumn(),
+                                                   _endPos.getRow(), _endPos.getColumn());
+    }
+
+    //add custom hashing
 }

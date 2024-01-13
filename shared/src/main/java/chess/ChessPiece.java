@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -61,25 +58,24 @@ public class ChessPiece {
 //        throw new RuntimeException("Not implemented");
 
         switch (_type){
-            case PieceType.BISHOP -> bishopMoves(board, myPosition);
-            case PieceType.ROOK -> rookMoves(board, myPosition);
+            case PieceType.BISHOP:
+                return bishopMoves(board, myPosition);
+            case PieceType.ROOK:
+                return rookMoves(board, myPosition);
+            default:
+                throw new RuntimeException("Moveset not implemented");
         }
 
-        throw new RuntimeException("Not implemented");
+
     }
 
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-//        throw new RuntimeException("Not implemented");
+    private Collection<ChessMove> traverseDiagonally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
 
-        List<ChessMove> validMoves = new ArrayList<>();
-
-        int iterations = 0;
+        HashSet<ChessMove> validMoves = new HashSet<>();
         ChessPiece checkedPiece;
 
-        // Upper-Right direction
-        iterations = Math.min(7 - myPosition.getRow(), 7 - myPosition.getColumn());
         for (int i = 1; i <= iterations; i++){
-            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
+            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + (i * rowDirectionScalar), myPosition.getColumn() + (i * columnDirectionScalar));
             checkedPiece = board.getPiece(checkedPosition);
 
             ChessMove move = new ChessMove(myPosition, checkedPosition, null);
@@ -95,7 +91,56 @@ public class ChessPiece {
 
             break;
         }
+        System.out.println(validMoves);
+        return validMoves;
+    }
 
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+//        throw new RuntimeException("Not implemented");
+
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        int iterations = 0;
+        ChessPiece checkedPiece;
+
+        // Upper-Right direction
+        iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
+
+        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, 1, 1));
+
+        // Upper-Left direction
+        iterations = Math.min(myPosition.getRow() - 1, 8 - myPosition.getColumn());
+
+        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, -1, 1));
+
+        // Lower-Right direction
+        iterations = Math.min(8 - myPosition.getRow(), myPosition.getColumn() - 1);
+
+        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, 1, -1));
+
+        // Lower-Left direction
+        iterations = Math.min(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+
+        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, -1, -1));
+
+//        for (int i = 1; i <= iterations; i++){
+//            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
+//            checkedPiece = board.getPiece(checkedPosition);
+//
+//            ChessMove move = new ChessMove(myPosition, checkedPosition, null);
+//
+//            if(checkedPiece == null){
+//                validMoves.add(move);
+//                continue;
+//            }
+//
+//            if(checkedPiece.getTeamColor() != _color){
+//                validMoves.add(move);
+//            }
+//
+//            break;
+//        }
+        System.out.println(validMoves);
         return validMoves;
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
