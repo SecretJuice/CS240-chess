@@ -69,7 +69,18 @@ public class ChessPiece {
 
     }
 
-    private Collection<ChessMove> traverseDiagonally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
+//    private Collection<ChessMove> traverseLaterally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
+//        
+//        HashSet<ChessMove> validMoves = new HashSet<>();
+//        ChessPiece checkedPiece;
+//        
+//        for (int i = 1; i <= iterations; i++){
+//            
+//        }
+//        
+//    }
+
+    private Collection<ChessMove> traverseLaterally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
 
         HashSet<ChessMove> validMoves = new HashSet<>();
         ChessPiece checkedPiece;
@@ -91,7 +102,7 @@ public class ChessPiece {
 
             break;
         }
-        System.out.println(validMoves);
+//        System.out.println(validMoves);
         return validMoves;
     }
 
@@ -106,22 +117,22 @@ public class ChessPiece {
         // Upper-Right direction
         iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
 
-        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, 1, 1));
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 1));
 
         // Upper-Left direction
         iterations = Math.min(myPosition.getRow() - 1, 8 - myPosition.getColumn());
 
-        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, -1, 1));
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 1));
 
         // Lower-Right direction
         iterations = Math.min(8 - myPosition.getRow(), myPosition.getColumn() - 1);
 
-        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, 1, -1));
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, -1));
 
         // Lower-Left direction
         iterations = Math.min(myPosition.getRow() - 1, myPosition.getColumn() - 1);
 
-        validMoves.addAll(traverseDiagonally(board, myPosition, iterations, -1, -1));
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, -1));
 
 //        for (int i = 1; i <= iterations; i++){
 //            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
@@ -140,16 +151,55 @@ public class ChessPiece {
 //
 //            break;
 //        }
-        System.out.println(validMoves);
+//        System.out.println(validMoves);
         return validMoves;
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        int iterations = 0;
+        ChessPiece checkedPiece;
+
+        // Upper-Right direction
+        iterations = 8 - myPosition.getRow();
+
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 0));
+
+        // Upper-Left direction
+        iterations = 8 - myPosition.getColumn();
+
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, 1));
+
+        // Lower-Right direction
+        iterations = myPosition.getRow() - 1;
+
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 0));
+
+        // Lower-Left direction
+        iterations = myPosition.getColumn() - 1;
+
+        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
+
+        System.out.println(validMoves);
+        return validMoves;
     }
 
     private boolean checkEnemyColor(ChessPiece piece){
 
         return piece.getTeamColor() != _color;
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return _color == that._color && _type == that._type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_color, _type);
     }
 }
