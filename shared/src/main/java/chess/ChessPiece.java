@@ -68,6 +68,7 @@ public class ChessPiece {
             case PieceType.ROOK -> rookMoves(board, myPosition);
             case PieceType.QUEEN -> queenMoves(board, myPosition);
             case PieceType.KING -> kingMoves(board, myPosition);
+            case PieceType.KNIGHT -> knightMoves(board, myPosition);
             default -> throw new RuntimeException("Moveset not implemented");
         };
 
@@ -124,29 +125,51 @@ public class ChessPiece {
                     break;
                 case PosCheckResult.EMPTY:
                     validMoves.add(move);
+                    continue;
                 case PosCheckResult.CAPTURABLE:
                     validMoves.add(move);
-                    break;
             }
 
-//            if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
-//                break;
-//            }
-//
-//
-//            if(checkedPiece == null){
-//                validMoves.add(move);
-//                continue;
-//            }
-//
-//            if(checkedPiece.getTeamColor() != _color){
-//                validMoves.add(move);
-//            }
-//
-//            break;
+            break;
+
         }
-//        System.out.println(validMoves);
         return validMoves;
+    }
+
+    private ChessMove knightCheckPosition(ChessBoard board, ChessPosition myPosition, int rowDelta, int columnDelta){
+
+        ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + rowDelta, myPosition.getColumn() + columnDelta);
+
+        PosCheckResult checkResult = checkPosition(board, checkedPosition);
+
+
+        if (checkResult != PosCheckResult.BLOCKED){
+            return new ChessMove(myPosition, checkedPosition, null);
+        }
+        else {
+            return null;
+        }
+    }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+
+        validMoves.add(knightCheckPosition(board, myPosition, 2, 1));
+        validMoves.add(knightCheckPosition(board, myPosition, 1, 2));
+        validMoves.add(knightCheckPosition(board, myPosition, -1, 2));
+        validMoves.add(knightCheckPosition(board, myPosition, -2, 1));
+        validMoves.add(knightCheckPosition(board, myPosition, 2, -1));
+        validMoves.add(knightCheckPosition(board, myPosition, 1, -2));
+        validMoves.add(knightCheckPosition(board, myPosition, -1, -2));
+        validMoves.add(knightCheckPosition(board, myPosition, -2, -1));
+
+        validMoves.remove(null);
+
+        return validMoves;
+
+
     }
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
