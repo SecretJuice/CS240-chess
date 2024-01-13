@@ -30,6 +30,12 @@ public class ChessPiece {
         PAWN
     }
 
+    private enum PosCheckResult{
+        EMPTY,
+        CAPTURABLE,
+        BLOCKED
+    }
+
 
     /**
      * @return Which team this chess piece belongs to
@@ -79,6 +85,27 @@ public class ChessPiece {
 //        
 //    }
 
+    private PosCheckResult checkPosition(ChessBoard board, ChessPosition checkedPosition){
+
+        if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
+            return PosCheckResult.BLOCKED;
+        }
+
+        ChessPiece checkedPiece = board.getPiece(checkedPosition);
+
+        if (checkedPiece == null){
+            return PosCheckResult.EMPTY;
+        }
+        else if (checkedPiece.getTeamColor() != this.getTeamColor()){
+            return PosCheckResult.CAPTURABLE;
+        }
+        else {
+            return PosCheckResult.BLOCKED;
+        }
+
+
+    }
+
     private Collection<ChessMove> traverseLaterally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
 
         HashSet<ChessMove> validMoves = new HashSet<>();
@@ -86,25 +113,37 @@ public class ChessPiece {
 
         for (int i = 1; i <= iterations; i++){
             ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + (i * rowDirectionScalar), myPosition.getColumn() + (i * columnDirectionScalar));
-
-            if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
-                break;
-            }
-
-            checkedPiece = board.getPiece(checkedPosition);
+//            checkedPiece = board.getPiece(checkedPosition);
 
             ChessMove move = new ChessMove(myPosition, checkedPosition, null);
 
-            if(checkedPiece == null){
-                validMoves.add(move);
-                continue;
+            PosCheckResult checkResult = checkPosition(board, checkedPosition);
+
+            switch (checkResult){
+                case PosCheckResult.BLOCKED:
+                    break;
+                case PosCheckResult.EMPTY:
+                    validMoves.add(move);
+                case PosCheckResult.CAPTURABLE:
+                    validMoves.add(move);
+                    break;
             }
 
-            if(checkedPiece.getTeamColor() != _color){
-                validMoves.add(move);
-            }
-
-            break;
+//            if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
+//                break;
+//            }
+//
+//
+//            if(checkedPiece == null){
+//                validMoves.add(move);
+//                continue;
+//            }
+//
+//            if(checkedPiece.getTeamColor() != _color){
+//                validMoves.add(move);
+//            }
+//
+//            break;
         }
 //        System.out.println(validMoves);
         return validMoves;
@@ -115,11 +154,8 @@ public class ChessPiece {
 
         HashSet<ChessMove> validMoves = new HashSet<>();
 
-        int iterations = 0;
-        ChessPiece checkedPiece;
-
         // Upper-Right direction
-        iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
+        int iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
 
         validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 1));
 
@@ -144,7 +180,6 @@ public class ChessPiece {
         HashSet<ChessMove> validMoves = new HashSet<>();
 
         int iterations = 0;
-        ChessPiece checkedPiece;
 
         // Upper-Right direction
         iterations = 8 - myPosition.getRow();
