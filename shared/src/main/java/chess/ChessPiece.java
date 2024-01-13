@@ -57,14 +57,13 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 //        throw new RuntimeException("Not implemented");
 
-        switch (_type){
-            case PieceType.BISHOP:
-                return bishopMoves(board, myPosition);
-            case PieceType.ROOK:
-                return rookMoves(board, myPosition);
-            default:
-                throw new RuntimeException("Moveset not implemented");
-        }
+        return switch (_type) {
+            case PieceType.BISHOP -> bishopMoves(board, myPosition);
+            case PieceType.ROOK -> rookMoves(board, myPosition);
+            case PieceType.QUEEN -> queenMoves(board, myPosition);
+            case PieceType.KING -> kingMoves(board, myPosition);
+            default -> throw new RuntimeException("Moveset not implemented");
+        };
 
 
     }
@@ -87,6 +86,11 @@ public class ChessPiece {
 
         for (int i = 1; i <= iterations; i++){
             ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + (i * rowDirectionScalar), myPosition.getColumn() + (i * columnDirectionScalar));
+
+            if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
+                break;
+            }
+
             checkedPiece = board.getPiece(checkedPosition);
 
             ChessMove move = new ChessMove(myPosition, checkedPosition, null);
@@ -134,24 +138,6 @@ public class ChessPiece {
 
         validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, -1));
 
-//        for (int i = 1; i <= iterations; i++){
-//            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
-//            checkedPiece = board.getPiece(checkedPosition);
-//
-//            ChessMove move = new ChessMove(myPosition, checkedPosition, null);
-//
-//            if(checkedPiece == null){
-//                validMoves.add(move);
-//                continue;
-//            }
-//
-//            if(checkedPiece.getTeamColor() != _color){
-//                validMoves.add(move);
-//            }
-//
-//            break;
-//        }
-//        System.out.println(validMoves);
         return validMoves;
     }
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
@@ -180,7 +166,32 @@ public class ChessPiece {
 
         validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
 
-        System.out.println(validMoves);
+//        System.out.println(validMoves);
+        return validMoves;
+    }
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        validMoves.addAll(rookMoves(board, myPosition));
+        validMoves.addAll(bishopMoves(board, myPosition));
+
+        return validMoves;
+    }
+
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, 1));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, -1));
+
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
+
         return validMoves;
     }
 
