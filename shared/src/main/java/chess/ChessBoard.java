@@ -106,7 +106,7 @@ public class ChessBoard {
                         case KING -> pieceChar = 'k';
                         case BISHOP -> pieceChar = 'b';
                         case QUEEN -> pieceChar = 'q';
-                        default -> pieceChar = 'X';
+                        default -> pieceChar = '#';
                     }
 
                     if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){

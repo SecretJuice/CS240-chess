@@ -1,5 +1,9 @@
 package chess;
 
+import chess.pieces.BishopMoveFinder;
+import chess.pieces.QueenMoveFinder;
+import chess.pieces.RookMoveFinder;
+
 import java.util.*;
 
 /**
@@ -64,9 +68,9 @@ public class ChessPiece {
 //        throw new RuntimeException("Not implemented");
 
         return switch (_type) {
-            case PieceType.BISHOP -> bishopMoves(board, myPosition);
-            case PieceType.ROOK -> rookMoves(board, myPosition);
-            case PieceType.QUEEN -> queenMoves(board, myPosition);
+            case PieceType.BISHOP -> new BishopMoveFinder(this).pieceMoves(board, myPosition);
+            case PieceType.ROOK -> new RookMoveFinder(this).pieceMoves(board, myPosition);
+            case PieceType.QUEEN -> new QueenMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.KING -> kingMoves(board, myPosition);
             case PieceType.KNIGHT -> knightMoves(board, myPosition);
             default -> throw new RuntimeException("Moveset not implemented");
@@ -172,70 +176,70 @@ public class ChessPiece {
 
     }
 
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-//        throw new RuntimeException("Not implemented");
+//    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+////        throw new RuntimeException("Not implemented");
+//
+//        HashSet<ChessMove> validMoves = new HashSet<>();
+//
+//        // Upper-Right direction
+//        int iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 1));
+//
+//        // Upper-Left direction
+//        iterations = Math.min(myPosition.getRow() - 1, 8 - myPosition.getColumn());
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 1));
+//
+//        // Lower-Right direction
+//        iterations = Math.min(8 - myPosition.getRow(), myPosition.getColumn() - 1);
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, -1));
+//
+//        // Lower-Left direction
+//        iterations = Math.min(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, -1));
+//
+//        return validMoves;
+//    }
+//    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+//        HashSet<ChessMove> validMoves = new HashSet<>();
+//
+//        int iterations = 0;
+//
+//        // Upper-Right direction
+//        iterations = 8 - myPosition.getRow();
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 0));
+//
+//        // Upper-Left direction
+//        iterations = 8 - myPosition.getColumn();
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, 1));
+//
+//        // Lower-Right direction
+//        iterations = myPosition.getRow() - 1;
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 0));
+//
+//        // Lower-Left direction
+//        iterations = myPosition.getColumn() - 1;
+//
+//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
+//
+////        System.out.println(validMoves);
+//        return validMoves;
+//    }
 
-        HashSet<ChessMove> validMoves = new HashSet<>();
-
-        // Upper-Right direction
-        int iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 1));
-
-        // Upper-Left direction
-        iterations = Math.min(myPosition.getRow() - 1, 8 - myPosition.getColumn());
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 1));
-
-        // Lower-Right direction
-        iterations = Math.min(8 - myPosition.getRow(), myPosition.getColumn() - 1);
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, -1));
-
-        // Lower-Left direction
-        iterations = Math.min(myPosition.getRow() - 1, myPosition.getColumn() - 1);
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, -1));
-
-        return validMoves;
-    }
-    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
-        HashSet<ChessMove> validMoves = new HashSet<>();
-
-        int iterations = 0;
-
-        // Upper-Right direction
-        iterations = 8 - myPosition.getRow();
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 0));
-
-        // Upper-Left direction
-        iterations = 8 - myPosition.getColumn();
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, 1));
-
-        // Lower-Right direction
-        iterations = myPosition.getRow() - 1;
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 0));
-
-        // Lower-Left direction
-        iterations = myPosition.getColumn() - 1;
-
-        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
-
-//        System.out.println(validMoves);
-        return validMoves;
-    }
-
-    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
-        HashSet<ChessMove> validMoves = new HashSet<>();
-
-        validMoves.addAll(rookMoves(board, myPosition));
-        validMoves.addAll(bishopMoves(board, myPosition));
-
-        return validMoves;
-    }
+//    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
+//        HashSet<ChessMove> validMoves = new HashSet<>();
+//
+////        validMoves.addAll(rookMoves(board, myPosition));
+////        validMoves.addAll(bishopMoves(board, myPosition));
+//
+//        return validMoves;
+//    }
 
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
         HashSet<ChessMove> validMoves = new HashSet<>();
@@ -251,12 +255,6 @@ public class ChessPiece {
         validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, -1));
 
         return validMoves;
-    }
-
-    private boolean checkEnemyColor(ChessPiece piece){
-
-        return piece.getTeamColor() != _color;
-
     }
 
     @Override
