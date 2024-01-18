@@ -1,8 +1,6 @@
 package chess;
 
-import chess.pieces.BishopMoveFinder;
-import chess.pieces.QueenMoveFinder;
-import chess.pieces.RookMoveFinder;
+import chess.pieces.*;
 
 import java.util.*;
 
@@ -34,12 +32,6 @@ public class ChessPiece {
         PAWN
     }
 
-    private enum PosCheckResult{
-        EMPTY,
-        CAPTURABLE,
-        BLOCKED
-    }
-
 
     /**
      * @return Which team this chess piece belongs to
@@ -65,197 +57,19 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        throw new RuntimeException("Not implemented");
 
         return switch (_type) {
             case PieceType.BISHOP -> new BishopMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.ROOK -> new RookMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.QUEEN -> new QueenMoveFinder(this).pieceMoves(board, myPosition);
-            case PieceType.KING -> kingMoves(board, myPosition);
-            case PieceType.KNIGHT -> knightMoves(board, myPosition);
+            case PieceType.KING -> new KingMoveFinder(this).pieceMoves(board, myPosition);
+            case PieceType.KNIGHT -> new KnightMoveFinder(this).pieceMoves(board, myPosition);
             default -> throw new RuntimeException("Moveset not implemented");
         };
 
 
     }
 
-//    private Collection<ChessMove> traverseLaterally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
-//        
-//        HashSet<ChessMove> validMoves = new HashSet<>();
-//        ChessPiece checkedPiece;
-//        
-//        for (int i = 1; i <= iterations; i++){
-//            
-//        }
-//        
-//    }
-
-    private PosCheckResult checkPosition(ChessBoard board, ChessPosition checkedPosition){
-
-        if (checkedPosition.getRow() > 8 || checkedPosition.getRow() < 1 || checkedPosition.getColumn() > 8 || checkedPosition.getColumn() < 1){
-            return PosCheckResult.BLOCKED;
-        }
-
-        ChessPiece checkedPiece = board.getPiece(checkedPosition);
-
-        if (checkedPiece == null){
-            return PosCheckResult.EMPTY;
-        }
-        else if (checkedPiece.getTeamColor() != this.getTeamColor()){
-            return PosCheckResult.CAPTURABLE;
-        }
-        else {
-            return PosCheckResult.BLOCKED;
-        }
-
-
-    }
-
-    private Collection<ChessMove> traverseLaterally(ChessBoard board, ChessPosition myPosition, int iterations, int rowDirectionScalar, int columnDirectionScalar) {
-
-        HashSet<ChessMove> validMoves = new HashSet<>();
-        ChessPiece checkedPiece;
-
-        for (int i = 1; i <= iterations; i++){
-            ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + (i * rowDirectionScalar), myPosition.getColumn() + (i * columnDirectionScalar));
-//            checkedPiece = board.getPiece(checkedPosition);
-
-            ChessMove move = new ChessMove(myPosition, checkedPosition, null);
-
-            PosCheckResult checkResult = checkPosition(board, checkedPosition);
-
-            switch (checkResult){
-                case PosCheckResult.BLOCKED:
-                    break;
-                case PosCheckResult.EMPTY:
-                    validMoves.add(move);
-                    continue;
-                case PosCheckResult.CAPTURABLE:
-                    validMoves.add(move);
-            }
-
-            break;
-
-        }
-        return validMoves;
-    }
-
-    private ChessMove knightCheckPosition(ChessBoard board, ChessPosition myPosition, int rowDelta, int columnDelta){
-
-        ChessPosition checkedPosition = new ChessPosition(myPosition.getRow() + rowDelta, myPosition.getColumn() + columnDelta);
-
-        PosCheckResult checkResult = checkPosition(board, checkedPosition);
-
-
-        if (checkResult != PosCheckResult.BLOCKED){
-            return new ChessMove(myPosition, checkedPosition, null);
-        }
-        else {
-            return null;
-        }
-    }
-
-    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
-
-        HashSet<ChessMove> validMoves = new HashSet<>();
-
-
-        validMoves.add(knightCheckPosition(board, myPosition, 2, 1));
-        validMoves.add(knightCheckPosition(board, myPosition, 1, 2));
-        validMoves.add(knightCheckPosition(board, myPosition, -1, 2));
-        validMoves.add(knightCheckPosition(board, myPosition, -2, 1));
-        validMoves.add(knightCheckPosition(board, myPosition, 2, -1));
-        validMoves.add(knightCheckPosition(board, myPosition, 1, -2));
-        validMoves.add(knightCheckPosition(board, myPosition, -1, -2));
-        validMoves.add(knightCheckPosition(board, myPosition, -2, -1));
-
-        validMoves.remove(null);
-
-        return validMoves;
-
-
-    }
-
-//    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-////        throw new RuntimeException("Not implemented");
-//
-//        HashSet<ChessMove> validMoves = new HashSet<>();
-//
-//        // Upper-Right direction
-//        int iterations = Math.min(8 - myPosition.getRow(), 8 - myPosition.getColumn());
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 1));
-//
-//        // Upper-Left direction
-//        iterations = Math.min(myPosition.getRow() - 1, 8 - myPosition.getColumn());
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 1));
-//
-//        // Lower-Right direction
-//        iterations = Math.min(8 - myPosition.getRow(), myPosition.getColumn() - 1);
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, -1));
-//
-//        // Lower-Left direction
-//        iterations = Math.min(myPosition.getRow() - 1, myPosition.getColumn() - 1);
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, -1));
-//
-//        return validMoves;
-//    }
-//    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
-//        HashSet<ChessMove> validMoves = new HashSet<>();
-//
-//        int iterations = 0;
-//
-//        // Upper-Right direction
-//        iterations = 8 - myPosition.getRow();
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 1, 0));
-//
-//        // Upper-Left direction
-//        iterations = 8 - myPosition.getColumn();
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, 1));
-//
-//        // Lower-Right direction
-//        iterations = myPosition.getRow() - 1;
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, -1, 0));
-//
-//        // Lower-Left direction
-//        iterations = myPosition.getColumn() - 1;
-//
-//        validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
-//
-////        System.out.println(validMoves);
-//        return validMoves;
-//    }
-
-//    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
-//        HashSet<ChessMove> validMoves = new HashSet<>();
-//
-////        validMoves.addAll(rookMoves(board, myPosition));
-////        validMoves.addAll(bishopMoves(board, myPosition));
-//
-//        return validMoves;
-//    }
-
-    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
-        HashSet<ChessMove> validMoves = new HashSet<>();
-
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 0));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, 0));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, 1));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 0, -1));
-
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, 1));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, -1));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, -1, 1));
-        validMoves.addAll(traverseLaterally(board, myPosition, 1, 1, -1));
-
-        return validMoves;
-    }
 
     @Override
     public boolean equals(Object o) {
