@@ -10,6 +10,24 @@ public class PawnMoveFinder extends PieceMoveFinder{
         super(piece);
     }
 
+    private Collection<ChessMove> checkPromotions(ChessPosition myPosition, ChessPosition newPosition){
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        if ((newPosition.getRow() == 8 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (newPosition.getRow() == 1 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)){
+            validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
+            validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
+            validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
+            validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.KNIGHT));
+        }
+        else {
+
+            validMoves.add(new ChessMove(myPosition, newPosition, null));
+
+        }
+
+        return validMoves;
+    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
@@ -27,18 +45,7 @@ public class PawnMoveFinder extends PieceMoveFinder{
 
         if (posInFrontResult == PosCheckResult.EMPTY){
 
-
-            if ((posInFront.getRow() == 8 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (posInFront.getRow() == 1 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)){
-                validMoves.add(new ChessMove(myPosition, posInFront, ChessPiece.PieceType.QUEEN));
-                validMoves.add(new ChessMove(myPosition, posInFront, ChessPiece.PieceType.ROOK));
-                validMoves.add(new ChessMove(myPosition, posInFront, ChessPiece.PieceType.BISHOP));
-                validMoves.add(new ChessMove(myPosition, posInFront, ChessPiece.PieceType.KNIGHT));
-            }
-            else {
-
-                validMoves.add(new ChessMove(myPosition, posInFront, null));
-
-            }
+            validMoves.addAll(checkPromotions(myPosition, posInFront));
 
             //And row check added because test cases don't account for whether a piece was already moved
 
@@ -62,17 +69,7 @@ public class PawnMoveFinder extends PieceMoveFinder{
 
         if (posRightForwardResult == PosCheckResult.CAPTURABLE) {
 
-
-            if ((posRightForward.getRow() == 8 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (posRightForward.getRow() == 1 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)) {
-                validMoves.add(new ChessMove(myPosition, posRightForward, ChessPiece.PieceType.QUEEN));
-                validMoves.add(new ChessMove(myPosition, posRightForward, ChessPiece.PieceType.ROOK));
-                validMoves.add(new ChessMove(myPosition, posRightForward, ChessPiece.PieceType.BISHOP));
-                validMoves.add(new ChessMove(myPosition, posRightForward, ChessPiece.PieceType.KNIGHT));
-            } else {
-
-                validMoves.add(new ChessMove(myPosition, posRightForward, null));
-
-            }
+            validMoves.addAll(checkPromotions(myPosition, posRightForward));
         }
 
         ChessPosition posLeftForward = new ChessPosition(myPosition.getRow() + direction, myPosition.getColumn()-1);
@@ -80,17 +77,8 @@ public class PawnMoveFinder extends PieceMoveFinder{
 
         if (posLeftForwardResult == PosCheckResult.CAPTURABLE) {
 
+            validMoves.addAll(checkPromotions(myPosition, posLeftForward));
 
-            if ((posLeftForward.getRow() == 8 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (posLeftForward.getRow() == 1 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)) {
-                validMoves.add(new ChessMove(myPosition, posLeftForward, ChessPiece.PieceType.QUEEN));
-                validMoves.add(new ChessMove(myPosition, posLeftForward, ChessPiece.PieceType.ROOK));
-                validMoves.add(new ChessMove(myPosition, posLeftForward, ChessPiece.PieceType.BISHOP));
-                validMoves.add(new ChessMove(myPosition, posLeftForward, ChessPiece.PieceType.KNIGHT));
-            } else {
-
-                validMoves.add(new ChessMove(myPosition, posLeftForward, null));
-
-            }
         }
 
         return validMoves;

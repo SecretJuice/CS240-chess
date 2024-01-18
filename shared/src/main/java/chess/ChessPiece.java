@@ -12,8 +12,8 @@ import java.util.*;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor _color;
-    private ChessPiece.PieceType _type;
+    private final ChessGame.TeamColor _color;
+    private final ChessPiece.PieceType _type;
 
     private boolean _hasMoved;
 
@@ -83,7 +83,6 @@ public class ChessPiece {
             case PieceType.KING -> new KingMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.KNIGHT -> new KnightMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.PAWN -> new PawnMoveFinder(this).pieceMoves(board, myPosition);
-            default -> throw new RuntimeException("Moveset not implemented");
         };
 
 
