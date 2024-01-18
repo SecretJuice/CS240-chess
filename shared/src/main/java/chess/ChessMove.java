@@ -49,8 +49,8 @@ public class ChessMove {
     }
 
     public String toString(){
-        return String.format("[%d,%d] -> [%d,%d]", _startPos.getRow(), _startPos.getColumn(),
-                                                   _endPos.getRow(), _endPos.getColumn());
+        return String.format("[%d,%d] -> [%d,%d](%s)", _startPos.getRow(), _startPos.getColumn(),
+                                                   _endPos.getRow(), _endPos.getColumn(), _promotionPiece);
     }
 
     //add custom hashing

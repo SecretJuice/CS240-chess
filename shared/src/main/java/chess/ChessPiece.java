@@ -15,9 +15,19 @@ public class ChessPiece {
     private ChessGame.TeamColor _color;
     private ChessPiece.PieceType _type;
 
+    private boolean _hasMoved;
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, boolean hasMoved) {
+        _color = pieceColor;
+        _type = type;
+        _hasMoved = hasMoved;
+
+    }
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         _color = pieceColor;
         _type = type;
+        _hasMoved = false;
     }
 
     /**
@@ -49,6 +59,14 @@ public class ChessPiece {
         return _type;
     }
 
+    public boolean getHasMoved(){
+        return _hasMoved;
+    }
+
+    public void setHasMoved(boolean bool){
+        _hasMoved = bool;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -64,6 +82,7 @@ public class ChessPiece {
             case PieceType.QUEEN -> new QueenMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.KING -> new KingMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.KNIGHT -> new KnightMoveFinder(this).pieceMoves(board, myPosition);
+            case PieceType.PAWN -> new PawnMoveFinder(this).pieceMoves(board, myPosition);
             default -> throw new RuntimeException("Moveset not implemented");
         };
 
