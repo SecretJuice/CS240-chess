@@ -222,12 +222,11 @@ public class ChessGame {
 
         if (!isInCheck(teamColor)) {return false;}
 
-        ChessPosition kingPosition = getTeamKingPosition(getBoard(), teamColor);
+        Collection<ChessMove> teamMoves = getTeamValidMoves(getBoard(), teamColor);
 
-        Collection<ChessMove> validMoves = getTeamValidMoves(getBoard(), teamColor);
+        teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
 
-
-        return true;
+        return teamMoves.isEmpty();
         // get if in check
         // iterate over all legal moves: if after any of them I am out of check
 
@@ -266,7 +265,11 @@ public class ChessGame {
 
         if (isInCheck(teamColor)) {return false;}
 
-        return true;
+        Collection<ChessMove> teamMoves = getTeamValidMoves(getBoard(), teamColor);
+
+        teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
+
+        return teamMoves.isEmpty();
 
     }
 
