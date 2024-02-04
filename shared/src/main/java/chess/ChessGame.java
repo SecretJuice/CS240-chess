@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -50,14 +51,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        HashSet<ChessMove> validMoves = new HashSet<>();
         ChessPiece piece = getBoard().getPiece(startPosition);
 
         if (piece == null){
             return null;
         }
 
-        return piece.pieceMoves(getBoard(), startPosition);
+        validMoves.addAll(piece.pieceMoves(getBoard(), startPosition));
 
+        validMoves = (HashSet<ChessMove>) validMoves.stream().filter(move -> filterMoveForCheck(move, piece.getTeamColor())).collect(Collectors.toSet());
+
+//        System.out.println(validMoves);
+
+        return validMoves;
     }
 
     /**
@@ -78,9 +85,23 @@ public class ChessGame {
         else if (getTeamTurn() != movingPiece.getTeamColor()){
             throw new InvalidMoveException("Move is out of turn");
         }
-        
+        else if (!filterMoveForCheck(move, getTeamTurn())){
+            throw new InvalidMoveException("Moving team is in check at end of turn");
+        }
 
-        getBoard().addPiece(move.getStartPosition(), null);
+        movePieceOnBoard(getBoard(), move);
+
+
+        switch (getTeamTurn()){
+            case BLACK -> setTeamTurn(TeamColor.WHITE);
+            case WHITE -> setTeamTurn(TeamColor.BLACK);
+        }
+    }
+
+    private void movePieceOnBoard(ChessBoard board, ChessMove move){
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+
+        board.addPiece(move.getStartPosition(), null);
 
         ChessPiece.PieceType promotionType = move.getPromotionPiece();
 
@@ -90,12 +111,7 @@ public class ChessGame {
 
         ChessPiece movedPiece = new ChessPiece(movingPiece.getTeamColor(), promotionType, true);
 
-        getBoard().addPiece(move.getEndPosition(), movedPiece);
-
-        switch (getTeamTurn()){
-            case BLACK -> setTeamTurn(TeamColor.WHITE);
-            case WHITE -> setTeamTurn(TeamColor.BLACK);
-        }
+        board.addPiece(move.getEndPosition(), movedPiece);
     }
 
     /**
@@ -108,11 +124,11 @@ public class ChessGame {
 //        throw new RuntimeException("Not implemented");
 
         HashSet<ChessMove> enemyMoves = new HashSet<>();
-        ChessPosition kingPosition = getTeamKingPosition(teamColor);
+        ChessPosition kingPosition = getTeamKingPosition(getBoard(), teamColor);
 
         switch (teamColor){
-            case BLACK -> enemyMoves.addAll(getTeamValidMoves(TeamColor.WHITE));
-            case WHITE -> enemyMoves.addAll(getTeamValidMoves(TeamColor.BLACK));
+            case BLACK -> enemyMoves.addAll(getTeamValidMoves(getBoard(), TeamColor.WHITE));
+            case WHITE -> enemyMoves.addAll(getTeamValidMoves(getBoard(), TeamColor.BLACK));
         }
 
         for (ChessMove move : enemyMoves){
@@ -126,9 +142,55 @@ public class ChessGame {
 
     }
 
-    private ChessPosition getTeamKingPosition(TeamColor teamColor){
+    private boolean filterMoveForCheck (ChessMove chessMove, TeamColor teamColor){
+        ChessBoard virtualBoard = createVirtualChessBoard(getBoard());
 
-        ChessBoard board = getBoard();
+        movePieceOnBoard(virtualBoard, chessMove);
+
+        TeamColor enemyColor = null;
+        
+        switch(teamColor){
+            case BLACK -> enemyColor = TeamColor.WHITE;
+            case WHITE -> enemyColor = TeamColor.BLACK;
+        }
+        
+        Collection<ChessMove> enemyMoves = getTeamValidMoves(virtualBoard, enemyColor);
+
+        ChessPosition kingPosition = getTeamKingPosition(virtualBoard, teamColor);
+
+        for (ChessMove move : enemyMoves){
+            if (move.getEndPosition().equals(kingPosition)){
+                return false;
+            }
+        }
+
+
+        return true;
+    }
+
+    private ChessBoard createVirtualChessBoard (ChessBoard currentBoard){
+        ChessBoard virtualBoard = new ChessBoard();
+
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+
+                ChessPiece piece = currentBoard.getPiece(position);
+
+                virtualBoard.addPiece(position, piece);
+            }
+        }
+
+//        System.out.println("GAME BOARD:\n");
+//        System.out.println(currentBoard);
+//        System.out.println("VIRTUAL BOARD:\n");
+//        System.out.println(virtualBoard);
+
+        return virtualBoard;
+    }
+
+    private ChessPosition getTeamKingPosition(ChessBoard board, TeamColor teamColor){
+
 
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
@@ -157,14 +219,22 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        if (!isInCheck(teamColor)) {return false;}
+
+        ChessPosition kingPosition = getTeamKingPosition(getBoard(), teamColor);
+
+        Collection<ChessMove> validMoves = getTeamValidMoves(getBoard(), teamColor);
+
+
+        return true;
+        // get if in check
+        // iterate over all legal moves: if after any of them I am out of check
 
     }
 
-    private Collection<ChessMove> getTeamValidMoves(TeamColor teamColor){
+    private Collection<ChessMove> getTeamValidMoves(ChessBoard board, TeamColor teamColor){
         HashSet<ChessMove> validMoves = new HashSet<>();
-
-        ChessBoard board = getBoard();
 
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
@@ -180,7 +250,7 @@ public class ChessGame {
             }
         }
 
-        System.out.println(validMoves);
+//        System.out.println(validMoves);
 
         return validMoves;
     }
@@ -193,7 +263,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        if (isInCheck(teamColor)) {return false;}
+
+        return true;
+
     }
 
     /**
