@@ -1,0 +1,144 @@
+title Chess Game Sequence Diagram
+actor Client
+participant Handlers
+participant Services
+participant DAOs
+database DB
+
+
+group #blue Register #white
+
+
+Client -> Handlers:[POST] /user\n(username, password, email)
+Handlers->Handlers:Decode User Model(with decoder class)
+Handlers->Services:registerUser(user)
+Services->DAOs:getUser(user.username)
+DAOs->DB: SELECT uid FROM user \nWHERE username = ?; \n(user.username)
+DAOs-->Services:null
+Services->DAOs:createUser(user)
+DAOs->DB:INSERT username, password, email\nINTO user;\n(user.username, user.password, user.email)
+DAOs-->Services:uid
+Services->DAOs:createAuth(uid)
+DAOs->DB:INSERT uid, authToken\nINTO auth
+DAOs -->Services:auth
+Services-->Handlers:auth
+Handlers->Handlers:Encode Auth  JSON (with encoder class)
+Handlers-->Client:200\n{auth}
+end
+
+group #orange Login #white
+
+Client->Handlers:[POST] /session\n{username, password}
+Handlers->Handlers:Decode User Model
+Handlers->Services:loginUser(user)
+Services->DAOs:getUser(user)
+DAOs->DB:SELECT uid FROM user\nWHERE username = ?\nAND password = ?; (user.username, user.password)
+DAOs-->Services:uid
+Services->DAOs:createAuth(uid)
+DAOs->DB:INSERT uid, authToken\nINTO auth;
+DAOs -->Services:auth
+Services-->Handlers:auth
+Handlers->Handlers:Encode Auth  JSON (with encoder class)
+Handlers-->Client:200\n{auth}
+
+end
+group #green Logout #white
+
+Client->Handlers:[DELETE] /session\nauthToken
+Handlers->Handlers:Decode Header into Auth Model
+Handlers->Services:endSession(auth)
+Services->DAOs:deleteAuth(auth)
+DAOs->DB:DELETE FROM auth\nWHERE authToken = ?; \n(auth.authToken)
+DAOs-->Services:void
+Services-->Handlers:void
+Handlers-->Client:200
+
+end
+group #red List Games #white
+
+Client->Handlers:[GET] /game\nauthToken
+
+//Authenticate
+Handlers->Handlers:Decode Header into Auth Model
+Handlers->Services:authenticateSession(auth)
+Services->DAOs:getAuth(auth)
+DAOs->DB:SELECT uid FROM auth\nWHERE authToken = ?; (auth.authToken)
+DAOs-->Services:uid
+Services-->Handlers:uid
+
+Handlers->Services:.getAllGames()
+Services->DAOs:getAllGames()
+DAOs->DB:SELECT * FROM game;
+DAOs-->Services:[games]
+Services-->Handlers:[games]
+Handlers->Handlers:Encode to Game JSON array
+Handlers-->Client:200\n{[games]}
+
+end
+group #purple Create Game #white
+
+Client->Handlers:[POST] /game\nauthToken\n{gameName}
+
+//Authenticate
+Handlers->Handlers:Decode Header into Auth Model
+Handlers->Services:authenticateSession(auth)
+Services->DAOs:getAuth(auth)
+DAOs->DB:SELECT uid FROM auth\nWHERE authToken = ?; (auth.authToken)
+DAOs-->Services:uid
+Services-->Handlers:uid
+
+Handlers->Handlers:Decode Body into Game Model
+Handlers->Services:createGame(game)
+Services->DAOs:createGame(game)
+DAOs->DB:INSERT gameName INTO game; (game.gameName)
+DAOs-->Services: gameID
+Services-->Handlers: gameID
+Handlers-->Client:200\n{"gameID"}
+
+
+end
+group #yellow Join Game #black
+Client->Handlers:[PUT] /game\nauthToken\n{playerColor, gameID}
+
+//Authenticate
+Handlers->Handlers:Decode Header into Auth Model
+Handlers->Services:authenticateSession(auth)
+Services->DAOs:getAuth(auth)
+DAOs->DB:SELECT uid FROM auth\nWHERE authToken = ?; (auth.authToken)
+DAOs-->Services:uid
+Services-->Handlers:uid
+
+
+//Join Game
+Handlers->Services:joinGame(playerColor, gameID, uid)
+
+Services->DAOs: getGame(gameID)
+DAOs->DB:SELECT * FROM game\nWHERE gameID = ?;
+DAOs-->Services:game
+
+Services->DAOs:updateGame(game[modified])
+DAOs->DB:UPDATE game\nSET black_player = ?,\nwhite_player = ?\nWHERE gameID = ?;\n(game.black_player, game.white_player, game.gameID)
+
+DAOs-->Services:void
+Services-->Handlers:void
+Handlers-->Client:200
+
+end
+group #grey Clear App #white
+
+Client->Handlers:[DELETE] /db
+Handlers->Services:clearApplication()
+Services->DAOs:clearUsers()
+DAOs->DB:TRUNCATE user;
+DAOs-->Services:void
+Services->DAOs:clearAuths()
+DAOs->DB:TRUNCATE auth;
+DAOs-->Services:void
+Services->DAOs:clearGames()
+DAOs->DB:TRUNCATE game;
+DAOs-->Services:void
+Services-->Handlers:void
+Handlers-->Client:200
+
+end
+
