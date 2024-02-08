@@ -4,6 +4,7 @@ import dataAccess.LocalAuthDAO;
 import dataAccess.LocalUserDAO;
 import model.AuthData;
 import model.UserData;
+import server.AuthFactoryRandomToken;
 import server.services.UserRegistrationService;
 
 public class RegisterHandler extends Handler{
@@ -12,8 +13,8 @@ public class RegisterHandler extends Handler{
 
         UserData userData = new UserData("Yourmom", "password1234", "yourmom@mom.com");
 
-        AuthData authData = new UserRegistrationService().registerUser(userData, new LocalUserDAO(), new LocalAuthDAO());
+//        AuthData authData = new UserRegistrationService().registerUser(userData, new LocalUserDAO(), new LocalAuthDAO(), new AuthFactoryRandomToken());
 
-        return String.format("{\"authToken\":\"{%s}\"}", authData.authToken());
+        return String.format("{\"authToken\":\"{%s}\"}", "authData.authToken()");
     }
 }

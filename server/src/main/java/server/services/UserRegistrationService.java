@@ -1,32 +1,31 @@
 package server.services;
 
 import dataAccess.AuthDataAccess;
+import dataAccess.DataAccessException;
 import dataAccess.UserDataAccess;
 import model.AuthData;
 import model.UserData;
+import server.AuthFactory;
 
 import java.util.UUID;
 
 public class UserRegistrationService {
 
-    public AuthData registerUser(UserData userData, UserDataAccess userDAO, AuthDataAccess authDAO){
+    public AuthData registerUser(UserData userData, UserDataAccess userDAO, AuthDataAccess authDAO, AuthFactory authFactory) throws ServiceException{
 
         try {
-            UserData existingUser = userDAO.getUser(userData.username());
-            if (existingUser == null){
-                userDAO.createUser(userData);
-            }
+            userDAO.createUser(userData);
 
-            AuthData authData = new AuthData(UUID.randomUUID().toString(), userData.username());
+            AuthData authData = authFactory.createAuthData(userData.username());
 
             authDAO.createAuth(authData);
 
             return authData;
-
-        } catch (Exception e){
-            System.err.println(e.getMessage());
-            return null;
         }
+        catch (DataAccessException e){
+            throw new ServiceException(e.getMessage());
+        }
+
     }
 
 }
