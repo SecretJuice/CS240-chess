@@ -19,6 +19,7 @@ public class Service {
             return authData;
         }
         catch (DataAccessException e){
+
             throw new ServiceException("Could not create Session");
         }
     }
