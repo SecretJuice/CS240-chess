@@ -1,14 +1,17 @@
 package server.services;
 
 import dataAccess.*;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 
 public class ApplicationClearService {
 
-    public void clearApplication(UserDataAccess userDAO, AuthDataAccess authDAO, GameDataAccess gameDAO) throws DataAccessException {
+    public void clearApplication(DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO) throws DataAccessException {
 
-        userDAO.clearUsers();
-        authDAO.clearAuths();
-        gameDAO.clearGames();
+        userDAO.clear();
+        authDAO.clear();
+        gameDAO.clear();
 
     }
 

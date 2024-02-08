@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class LocalUserDAO implements UserDataAccess{
+public class LocalUserDAO implements DataAccessObject<UserData>{
 
     private static HashMap<String, UserData> users = new HashMap<>();
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData get(String username) throws DataAccessException {
 
         return users.get(username);
     }
 
     @Override
-    public void createUser(UserData userData) throws DataAccessException {
+    public void create(UserData userData) throws DataAccessException {
 
         if (users.containsValue(userData)){
             throw new DataAccessException("User already exists");
@@ -27,7 +27,7 @@ public class LocalUserDAO implements UserDataAccess{
     }
 
     @Override
-    public void updateUser(UserData userData) throws DataAccessException {
+    public void update(UserData userData) throws DataAccessException {
 
         if (!users.containsKey(userData.username())){
             throw new DataAccessException("User not found");
@@ -37,7 +37,7 @@ public class LocalUserDAO implements UserDataAccess{
     }
 
     @Override
-    public void deleteUser(String username) throws DataAccessException {
+    public void delete(String username) throws DataAccessException {
         if (!users.containsKey(username)){
             throw new DataAccessException("User not found");
         }
@@ -46,13 +46,13 @@ public class LocalUserDAO implements UserDataAccess{
     }
 
     @Override
-    public void clearUsers() throws DataAccessException {
+    public void clear() throws DataAccessException {
 
         users.clear();
 
     }
 
-    public Collection<UserData> getAllUsers() throws DataAccessException {
+    public Collection<UserData> getAll() throws DataAccessException {
         return users.values();
     }
 }

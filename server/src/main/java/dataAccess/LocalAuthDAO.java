@@ -5,11 +5,11 @@ import model.AuthData;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class LocalAuthDAO implements AuthDataAccess{
+public class LocalAuthDAO implements DataAccessObject<AuthData>{
 
     private static HashMap<String, AuthData> sessions = new HashMap<>();
 
-    public void createAuth(AuthData authData) throws DataAccessException {
+    public void create(AuthData authData) throws DataAccessException {
         if (sessions.containsKey(authData.authToken())){
             throw new DataAccessException("Auth token already exists");
         }
@@ -17,24 +17,30 @@ public class LocalAuthDAO implements AuthDataAccess{
         sessions.put(authData.authToken(), authData);
     }
 
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData get(String authToken) throws DataAccessException {
         return sessions.get(authToken);
     }
 
-    public void deleteAuth(AuthData authData) throws DataAccessException {
+    public void update(AuthData authData) throws DataAccessException{
         if (!sessions.containsKey(authData.authToken())){
-            throw new DataAccessException("Auth token does not exist");
+            throw new DataAccessException("Session does not exist");
         }
-
-        sessions.remove(authData.authToken());
     }
 
-    public void clearAuths() throws DataAccessException {
+    public void delete(String authToken) throws DataAccessException {
+        if (!sessions.containsKey(authToken)){
+            throw new DataAccessException("Session does not exist");
+        }
+
+        sessions.remove(authToken);
+    }
+
+    public void clear() throws DataAccessException {
         sessions.clear();
     }
 
     @Override
-    public Collection<AuthData> getAllAuths() throws DataAccessException {
+    public Collection<AuthData> getAll() throws DataAccessException {
         return sessions.values();
     }
 }

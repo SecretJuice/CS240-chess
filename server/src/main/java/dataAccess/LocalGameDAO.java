@@ -5,11 +5,11 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class LocalGameDAO implements GameDataAccess{
+public class LocalGameDAO implements DataAccessObject<GameData>{
 
     private static HashMap<Integer, GameData> games = new HashMap<>();
 
-    public void createGame(GameData gameData) throws DataAccessException {
+    public void create(GameData gameData) throws DataAccessException {
 
         if (games.containsKey(gameData.gameID())){
             throw new DataAccessException(String.format("Game with ID: {%s} already exists", gameData.gameID()));
@@ -19,12 +19,16 @@ public class LocalGameDAO implements GameDataAccess{
 
     }
 
-    public Collection<GameData> getAllGames() throws DataAccessException {
+    public GameData get(String gameID) throws DataAccessException{
+        return games.get(Integer.parseInt(gameID));
+    }
+
+    public Collection<GameData> getAll() throws DataAccessException {
 
         return games.values();
     }
 
-    public void updateGame(GameData gameData) throws DataAccessException {
+    public void update(GameData gameData) throws DataAccessException {
 
         if (!games.containsKey(gameData.gameID())){
             throw new DataAccessException(String.format("Game with ID: {%s} was not found", gameData.gameID()));
@@ -34,9 +38,9 @@ public class LocalGameDAO implements GameDataAccess{
 
     }
 
-    public void deleteGame(int gameID) throws DataAccessException {
+    public void delete(String gameID) throws DataAccessException {
 
-        if (!games.containsKey(gameID)){
+        if (!games.containsKey(Integer.parseInt(gameID))){
             throw new DataAccessException(String.format("Game with ID: {%s} was not found", gameID));
         }
 
@@ -44,7 +48,7 @@ public class LocalGameDAO implements GameDataAccess{
 
     }
 
-    public void clearGames() throws DataAccessException {
+    public void clear() throws DataAccessException {
 
         games.clear();
 
