@@ -11,6 +11,9 @@ import server.AuthFactoryHashUsername;
 import server.services.ServiceException;
 import server.services.UserRegistrationService;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserRegistrationTest {
@@ -65,6 +68,21 @@ public class UserRegistrationTest {
         }catch (Exception e){}
 
         assertThrows(ServiceException.class, () -> new UserRegistrationService().registerUser(newUser, userDAO, authDAO, authFactory), "Should throw a ServiceException");
+
+        AuthData authData;
+        Collection<AuthData> sessions = new ArrayList<>();
+
+        try{
+            authData = authFactory.createAuthData(newUser.username());
+            sessions.addAll(authDAO.getAll());
+
+        }
+        catch (DataAccessException e){
+            fail("Test AuthData creation should not throw exception");
+            authData = null;
+        }
+
+        assertFalse(sessions.contains(authData), "New Auth should not be created for already existing user");
 
     }
 
