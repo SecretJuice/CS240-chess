@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.AuthData;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class LocalAuthDAO implements AuthDataAccess{
@@ -30,5 +31,10 @@ public class LocalAuthDAO implements AuthDataAccess{
 
     public void clearAuths() throws DataAccessException {
         sessions.clear();
+    }
+
+    @Override
+    public Collection<AuthData> getAllAuths() throws DataAccessException {
+        return sessions.values();
     }
 }

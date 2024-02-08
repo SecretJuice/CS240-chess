@@ -1,5 +1,6 @@
 package server;
 
+import server.handlers.ClearAppHandler;
 import server.handlers.Handler;
 import server.handlers.RegisterHandler;
 import spark.*;
@@ -24,7 +25,7 @@ public class Server {
      * Initializes all of the servers endpoints
      */
     private void registerEndpoints(){
-        Spark.delete("/db", (req, res) -> new Handler().handleRequest()); //Clear Application
+        Spark.delete("/db", (req, res) -> new ClearAppHandler().handleRequest()); //Clear Application
         Spark.post("/user", (req, res) -> new RegisterHandler().handleRequest()); //Register User
         Spark.post("/session", (req, res) -> new Handler().handleRequest()); //Login
         Spark.delete("/session", (req, res) -> new Handler().handleRequest()); //Logout

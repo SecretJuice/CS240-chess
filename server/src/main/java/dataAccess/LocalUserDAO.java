@@ -3,6 +3,7 @@ package dataAccess;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class LocalUserDAO implements UserDataAccess{
@@ -49,5 +50,9 @@ public class LocalUserDAO implements UserDataAccess{
 
         users.clear();
 
+    }
+
+    public Collection<UserData> getAllUsers() throws DataAccessException {
+        return users.values();
     }
 }
