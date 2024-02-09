@@ -6,7 +6,7 @@ import model.AuthData;
 import model.UserData;
 import server.AuthFactory;
 
-public class Service {
+public abstract class Service {
 
     protected AuthData createSession(UserData userData, DataAccessObject<AuthData> authDAO, AuthFactory authFactory) throws ServiceException {
 
