@@ -6,8 +6,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.AuthFactory;
 import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.services.ServiceException;
 import server.services.UserRegistrationService;
 
@@ -20,7 +20,7 @@ public class UserRegistrationTest {
 
     private DataAccessObject<UserData> userDAO;
     private DataAccessObject<AuthData> authDAO;
-    private AuthFactory authFactory;
+    private DataFactory<AuthData> authFactory;
 
     @BeforeEach
     void setup() throws DataAccessException{
@@ -53,7 +53,7 @@ public class UserRegistrationTest {
         assertEquals(userDAO.get(newUser.username()), newUser, "User must be gettable by username");
 
         assertNotNull(newUserAuth, "Must return AuthData");
-        assertEquals(newUserAuth, authFactory.createAuthData(newUser.username()), "Auth token must match output from factory");
+        assertEquals(newUserAuth, authFactory.createData(newUser.username()), "Auth token must match output from factory");
 
     }
 
@@ -73,7 +73,7 @@ public class UserRegistrationTest {
         Collection<AuthData> sessions = new ArrayList<>();
 
         try{
-            authData = authFactory.createAuthData(newUser.username());
+            authData = authFactory.createData(newUser.username());
             sessions.addAll(authDAO.getAll());
 
         }

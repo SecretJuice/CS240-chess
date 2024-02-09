@@ -4,11 +4,11 @@ import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import model.AuthData;
 import model.UserData;
-import server.AuthFactory;
+import server.DataFactory;
 
 public class UserRegistrationService extends Service{
 
-    public AuthData registerUser(UserData userData, DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, AuthFactory authFactory) throws ServiceException{
+    public AuthData registerUser(UserData userData, DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataFactory<AuthData> authFactory) throws ServiceException{
 
         try {
             userDAO.create(userData);

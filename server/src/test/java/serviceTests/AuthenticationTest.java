@@ -7,8 +7,8 @@ import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.AuthFactory;
 import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.services.AuthenticationService;
 import server.services.ServiceException;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AuthenticationTest {
 
     private DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
-    private AuthFactory authFactory = new AuthFactoryHashUsername();
+    private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
     @BeforeEach
     void setup() throws DataAccessException {
@@ -30,7 +30,7 @@ public class AuthenticationTest {
 
         try {
 
-            AuthData testAuth = authFactory.createAuthData("TestUser");
+            AuthData testAuth = authFactory.createData("TestUser");
 
             authDAO.create(testAuth);
 

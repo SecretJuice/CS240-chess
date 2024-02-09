@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.services.ApplicationClearService;
 
 import java.util.ArrayList;
@@ -20,19 +22,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationClearTest {
 
-    private DataAccessObject<UserData> userDAO;
-    private DataAccessObject<AuthData> authDAO;
-    private DataAccessObject<GameData> gameDAO;
+    private DataAccessObject<UserData> userDAO = new LocalUserDAO();
+    private DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
+    private DataAccessObject<GameData> gameDAO = new LocalGameDAO();
+    private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
-    private ApplicationClearService clearService;
+    private ApplicationClearService clearService = new ApplicationClearService();
 
     @BeforeEach
-    void setUpTests() {
-        userDAO = new LocalUserDAO();
-        authDAO = new LocalAuthDAO();
-        gameDAO = new LocalGameDAO();
+    void setUpTests() throws DataAccessException {
 
-        clearService = new ApplicationClearService();
+        authDAO.clear();
+        userDAO.clear();
+        gameDAO.clear();
+
     }
 
     @Test
@@ -57,7 +60,7 @@ public class ApplicationClearTest {
 
         }
         catch (DataAccessException e){
-            fail("Should not throw exception");
+            fail("Should not throw exception: " + e.getMessage());
         }
 
     }
@@ -69,10 +72,10 @@ public class ApplicationClearTest {
         userDAO.create(new UserData("User3", "1234", "mail@email.com"));
         userDAO.create(new UserData("User4", "1234", "mail@email.com"));
 
-        authDAO.create(new AuthData(UUID.randomUUID().toString(), "User1"));
-        authDAO.create(new AuthData(UUID.randomUUID().toString(), "User2"));
-        authDAO.create(new AuthData(UUID.randomUUID().toString(), "User3"));
-        authDAO.create(new AuthData(UUID.randomUUID().toString(), "User4"));
+        authDAO.create(authFactory.createData("User1"));
+        authDAO.create(authFactory.createData("User2"));
+        authDAO.create(authFactory.createData("User3"));
+        authDAO.create(authFactory.createData("User4"));
 
         gameDAO.create(new GameData(1, "User1", "User2", "Game1", new ChessGame()));
         gameDAO.create(new GameData(2, "User3", "User4", "Game2", new ChessGame()));

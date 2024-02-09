@@ -9,8 +9,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.AuthFactory;
 import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.services.ServiceException;
 import server.services.UserLoginService;
 
@@ -20,7 +20,7 @@ public class UserLoginTest {
 
     private final DataAccessObject<UserData> userDAO =  new LocalUserDAO();
     private final DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
-    private final AuthFactory authFactory = new AuthFactoryHashUsername();
+    private final DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
     @BeforeEach
     void setup() throws DataAccessException {
@@ -50,7 +50,7 @@ public class UserLoginTest {
             UserData loginUser = new UserData("NewUser", "password", null);
             AuthData loginAuth = new UserLoginService().loginUser(loginUser, userDAO, authDAO, authFactory);
 
-            AuthData testAuth = authFactory.createAuthData(loginUser.username());
+            AuthData testAuth = authFactory.createData(loginUser.username());
 
             assertNotNull(loginAuth, "UserLoginService should return AuthData");
             assertEquals(testAuth, loginAuth, "Auth must be for logged in user");

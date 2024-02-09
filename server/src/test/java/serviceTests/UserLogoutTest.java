@@ -9,8 +9,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.AuthFactory;
 import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.services.ServiceException;
 import server.services.UserLogoutService;
 import server.services.UserRegistrationService;
@@ -24,7 +24,7 @@ public class UserLogoutTest {
 
     private DataAccessObject<AuthData> authDOA = new LocalAuthDAO();
     private DataAccessObject<UserData> userDOA = new LocalUserDAO();
-    private AuthFactory authFactory = new AuthFactoryHashUsername();
+    private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
     @BeforeEach
     void setup() throws DataAccessException {
@@ -60,7 +60,7 @@ public class UserLogoutTest {
     @DisplayName("Session Doesn't Exist")
     void sessionDoesntExist(){
 
-        AuthData testAuth = authFactory.createAuthData("NewUser");
+        AuthData testAuth = authFactory.createData("NewUser");
 
         assertThrows(ServiceException.class, () -> new UserLogoutService().logoutUser(testAuth, authDOA));
 
