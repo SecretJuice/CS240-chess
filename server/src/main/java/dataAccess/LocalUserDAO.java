@@ -19,7 +19,7 @@ public class LocalUserDAO implements DataAccessObject<UserData>{
     @Override
     public void create(UserData userData) throws DataAccessException {
 
-        if (users.containsValue(userData)){
+        if (users.containsKey(userData.username())){
             throw new DataAccessException("User already exists");
         }
 
