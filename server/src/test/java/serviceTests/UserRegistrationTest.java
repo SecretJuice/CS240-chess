@@ -41,7 +41,7 @@ public class UserRegistrationTest {
         AuthData newUserAuth;
 
         try{
-           newUserAuth = new UserRegistrationService().registerUser(newUser, userDAO, authDAO, authFactory);
+           newUserAuth = new UserRegistrationService(userDAO, authDAO, authFactory).registerUser(newUser);
 
         }catch (Exception e){
             fail(e.getMessage());
@@ -67,7 +67,7 @@ public class UserRegistrationTest {
             userDAO.create(newUser);
         }catch (Exception e){}
 
-        assertThrows(ServiceException.class, () -> new UserRegistrationService().registerUser(newUser, userDAO, authDAO, authFactory), "Should throw a ServiceException");
+        assertThrows(ServiceException.class, () -> new UserRegistrationService(userDAO, authDAO, authFactory).registerUser(newUser), "Should throw a ServiceException");
 
         AuthData authData;
         Collection<AuthData> sessions = new ArrayList<>();

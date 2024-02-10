@@ -34,7 +34,7 @@ public class AuthenticationTest {
 
             authDAO.create(testAuth);
 
-            AuthData validSession = new AuthenticationService().authenticateSession(testAuth.authToken(), authDAO);
+            AuthData validSession = new AuthenticationService(authDAO).authenticateSession(testAuth.authToken());
 
             assertNotNull(validSession, "AuthenticationService should return AuthData");
             assertEquals(testAuth, validSession, "AuthData returned by AuthenticationService should match test AuthData");
@@ -50,7 +50,7 @@ public class AuthenticationTest {
     @DisplayName("Invalid Session")
     void invalidSessionTest() {
 
-        assertThrows(ServiceException.class, () -> new AuthenticationService().authenticateSession("faketoken", authDAO));
+        assertThrows(ServiceException.class, () -> new AuthenticationService(authDAO).authenticateSession("faketoken"));
 
     }
 }

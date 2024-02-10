@@ -5,7 +5,13 @@ import model.AuthData;
 
 public class UserLogoutService extends Service{
 
-    public void logoutUser (AuthData authData, DataAccessObject<AuthData> authDOA) throws ServiceException{
+    private final DataAccessObject<AuthData> authDOA;
+
+    public UserLogoutService (DataAccessObject<AuthData> authDataAccess){
+        authDOA = authDataAccess;
+    }
+
+    public void logoutUser (AuthData authData) throws ServiceException{
 
         try{
 

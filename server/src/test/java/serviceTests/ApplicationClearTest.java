@@ -27,7 +27,7 @@ public class ApplicationClearTest {
     private DataAccessObject<GameData> gameDAO = new LocalGameDAO();
     private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
-    private ApplicationClearService clearService = new ApplicationClearService();
+    private ApplicationClearService clearService = new ApplicationClearService(userDAO, authDAO, gameDAO);
 
     @BeforeEach
     void setUpTests() throws DataAccessException {
@@ -48,7 +48,7 @@ public class ApplicationClearTest {
             Collection<AuthData> auths = authDAO.getAll();
             Collection<GameData> games = gameDAO.getAll();
 
-            clearService.clearApplication(userDAO, authDAO, gameDAO);
+            clearService.clearApplication();
 
             Collection<UserData> emptyUsers = new ArrayList<>();
             Collection<AuthData> emptyAuths = new ArrayList<>();

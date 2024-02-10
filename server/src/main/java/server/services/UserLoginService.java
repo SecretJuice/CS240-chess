@@ -9,7 +9,20 @@ import java.util.Objects;
 
 public class UserLoginService extends Service{
 
-    public AuthData loginUser(UserData userData, DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataFactory<AuthData> authFactory) throws ServiceException{
+    private final DataAccessObject<UserData> userDAO;
+    private final DataAccessObject<AuthData> authDAO;
+    private final DataFactory<AuthData> authFactory;
+
+    public UserLoginService(DataAccessObject<UserData> userDataAccess, DataAccessObject<AuthData> authDataAccess, DataFactory<AuthData> authDataFactory){
+
+        userDAO = userDataAccess;
+        authDAO = authDataAccess;
+        authFactory = authDataFactory;
+
+    }
+
+
+    public AuthData loginUser(UserData userData) throws ServiceException{
 
         try{
 

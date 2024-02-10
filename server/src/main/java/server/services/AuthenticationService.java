@@ -5,7 +5,13 @@ import model.AuthData;
 
 public class AuthenticationService extends Service{
 
-    public AuthData authenticateSession(String authToken, DataAccessObject<AuthData> authDAO) throws ServiceException{
+    private final DataAccessObject<AuthData> authDAO;
+
+    public AuthenticationService (DataAccessObject<AuthData> authDataAccess){
+        authDAO = authDataAccess;
+    }
+
+    public AuthData authenticateSession(String authToken) throws ServiceException{
 
         try {
             AuthData session = authDAO.get(authToken);

@@ -9,7 +9,15 @@ import java.util.Objects;
 
 public class JoinGameService extends Service{
 
-    public GameData joinGame(JoinGameRequest request, AuthData session, DataAccessObject<GameData> gameDAO) throws ServiceException{
+    private final DataAccessObject<GameData> gameDAO;
+
+    public JoinGameService(DataAccessObject<GameData> gameDataAccess){
+
+        gameDAO = gameDataAccess;
+
+    }
+
+    public GameData joinGame(JoinGameRequest request, AuthData session) throws ServiceException{
 
         try{
 
@@ -28,10 +36,14 @@ public class JoinGameService extends Service{
             //Verify desired team isn't taken
             switch (request.teamColor()){
                 case WHITE -> {
-                    if (!Objects.equals(joinedGame.whiteUsername(), session.username())) { throw new ServiceException("Another user has already joined WHITE team"); }
+                    if ((!Objects.equals(joinedGame.whiteUsername(), session.username())) && joinedGame.whiteUsername() != null){
+                        throw new ServiceException("Another user has already joined WHITE team");
+                    }
                 }
                 case BLACK -> {
-                    if (!Objects.equals(joinedGame.blackUsername(), session.username())) { throw new ServiceException("Another user has already joined BLACK team"); }
+                    if ((!Objects.equals(joinedGame.blackUsername(), session.username())) && joinedGame.blackUsername() != null) {
+                        throw new ServiceException("Another user has already joined BLACK team");
+                    }
                 }
             }
 

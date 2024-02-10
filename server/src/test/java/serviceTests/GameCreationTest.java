@@ -35,7 +35,7 @@ public class GameCreationTest {
 
             GameData testGame = gameFactory.createData("TestGame");
 
-            GameData newGame = new GameCreationService().createGame("TestGame", gameDAO, gameFactory);
+            GameData newGame = new GameCreationService(gameDAO, gameFactory).createGame("TestGame");
 
             assertEquals(testGame, newGame, "GameCreationService should return same GameData as test");
 
@@ -63,8 +63,10 @@ public class GameCreationTest {
             fail("Test setup should not throw exceptions: " + e.getMessage());
         }
 
-        assertThrows(ServiceException.class, () -> new GameCreationService().createGame("TestGame", gameDAO, gameFactory));
+        assertThrows(ServiceException.class, () -> new GameCreationService(gameDAO, gameFactory).createGame("TestGame"));
 
     }
+
+
 
 }

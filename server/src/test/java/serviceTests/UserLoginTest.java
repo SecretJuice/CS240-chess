@@ -48,7 +48,7 @@ public class UserLoginTest {
 
         try{
             UserData loginUser = new UserData("NewUser", "password", null);
-            AuthData loginAuth = new UserLoginService().loginUser(loginUser, userDAO, authDAO, authFactory);
+            AuthData loginAuth = new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser);
 
             AuthData testAuth = authFactory.createData(loginUser.username());
 
@@ -68,7 +68,7 @@ public class UserLoginTest {
 
         UserData loginUser = new UserData("NonexistentUser", "password", null);
 
-        assertThrows(ServiceException.class, () -> new UserLoginService().loginUser(loginUser, userDAO, authDAO, authFactory), "Should throw ServiceException with message: 'User does not exist'");
+        assertThrows(ServiceException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw ServiceException with message: 'User does not exist'");
 
     }
 
@@ -78,7 +78,7 @@ public class UserLoginTest {
 
         UserData loginUser = new UserData("NewUser", "1234", null);
 
-        assertThrows(ServiceException.class, () -> new UserLoginService().loginUser(loginUser, userDAO, authDAO, authFactory), "Should throw ServiceException with message: 'Password is incorrect'");
+        assertThrows(ServiceException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw ServiceException with message: 'Password is incorrect'");
 
     }
 

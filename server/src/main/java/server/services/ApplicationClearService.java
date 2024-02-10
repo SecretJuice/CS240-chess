@@ -4,10 +4,21 @@ import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import server.DataFactory;
 
 public class ApplicationClearService {
 
-    public void clearApplication(DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO) throws DataAccessException {
+    private final DataAccessObject<UserData> userDAO;
+    private final DataAccessObject<AuthData> authDAO;
+    private final DataAccessObject<GameData> gameDAO;
+
+    public ApplicationClearService (DataAccessObject<UserData> userDataAccess, DataAccessObject<AuthData> authDataAccess, DataAccessObject<GameData> gameDataAccess){
+        userDAO = userDataAccess;
+        authDAO = authDataAccess;
+        gameDAO = gameDataAccess;
+    }
+
+    public void clearApplication() throws DataAccessException {
 
         userDAO.clear();
         authDAO.clear();

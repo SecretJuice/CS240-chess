@@ -12,7 +12,7 @@ public class ClearAppHandler extends Handler{
     public String handleRequest() throws DataAccessException {
         System.out.println("Clearing Application");
 
-        new ApplicationClearService().clearApplication(new LocalUserDAO(), new LocalAuthDAO(), new LocalGameDAO());
+        new ApplicationClearService(new LocalUserDAO(), new LocalAuthDAO(), new LocalGameDAO()).clearApplication();
 
         String yourmom = "{\"response\": \"Cleared App\"}";
 

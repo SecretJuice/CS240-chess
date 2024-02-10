@@ -36,7 +36,7 @@ public class GameBrowserTest {
 
             Collection<GameData> testGames = new ArrayList<>(gameDAO.getAll());
 
-            Collection<GameData> games = new GameBrowserService().getGameList(gameDAO);
+            Collection<GameData> games = new GameBrowserService(gameDAO).getGameList();
 
             assertFalse(games.isEmpty(), "GameBrowserService should return a collection of GameData");
             assertIterableEquals(testGames, games, "Contents of returned collection should match");
@@ -51,7 +51,7 @@ public class GameBrowserTest {
     @DisplayName("Empty Games List")
     void emptyGamesListTest(){
 
-        assertThrows(ServiceException.class, () -> new GameBrowserService().getGameList(gameDAO), "ServiceException should be thrown when there are no games.");
+        assertThrows(ServiceException.class, () -> new GameBrowserService(gameDAO).getGameList(), "ServiceException should be thrown when there are no games.");
     }
 
 }

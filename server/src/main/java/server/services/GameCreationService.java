@@ -7,7 +7,16 @@ import server.DataFactory;
 
 public class GameCreationService extends Service{
 
-    public GameData createGame (String gameName, DataAccessObject<GameData> gameDAO, DataFactory<GameData> gameFactory) throws ServiceException{
+    private final DataAccessObject<GameData> gameDAO;
+    private final DataFactory<GameData> gameFactory;
+
+    public GameCreationService (DataAccessObject<GameData> gameDataAccess, DataFactory<GameData> gameDataFactory){
+        gameDAO = gameDataAccess;
+        gameFactory = gameDataFactory;
+    }
+
+
+    public GameData createGame (String gameName) throws ServiceException{
 
         try {
             GameData newGame = gameFactory.createData(gameName);

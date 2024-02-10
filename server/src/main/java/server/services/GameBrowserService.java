@@ -8,7 +8,13 @@ import java.util.Collection;
 
 public class GameBrowserService extends Service{
 
-    public Collection<GameData> getGameList(DataAccessObject<GameData> gameDAO) throws ServiceException{
+    private final DataAccessObject<GameData> gameDAO;
+
+    public GameBrowserService (DataAccessObject<GameData> gameDataAccess){
+        gameDAO = gameDataAccess;
+    }
+
+    public Collection<GameData> getGameList() throws ServiceException{
 
         try{
             Collection<GameData> games = new ArrayList<>(gameDAO.getAll());

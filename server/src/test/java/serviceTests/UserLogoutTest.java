@@ -41,11 +41,11 @@ public class UserLogoutTest {
         try {
 
             UserData testUser = new UserData("NewUser", "password", "1234@1234.com");
-            testAuth = new UserRegistrationService().registerUser(testUser, userDOA, authDOA, authFactory);
+            testAuth = new UserRegistrationService(userDOA, authDOA, authFactory).registerUser(testUser);
 
             assertNotNull(testAuth, "Need to initialize Auth");
 
-            new UserLogoutService().logoutUser(testAuth, authDOA);
+            new UserLogoutService(authDOA).logoutUser(testAuth);
 
             Collection<AuthData> sessions = new ArrayList<>(authDOA.getAll());
 
@@ -62,7 +62,7 @@ public class UserLogoutTest {
 
         AuthData testAuth = authFactory.createData("NewUser");
 
-        assertThrows(ServiceException.class, () -> new UserLogoutService().logoutUser(testAuth, authDOA));
+        assertThrows(ServiceException.class, () -> new UserLogoutService(authDOA).logoutUser(testAuth));
 
     }
 
