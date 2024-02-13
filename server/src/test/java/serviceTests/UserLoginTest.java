@@ -56,7 +56,7 @@ public class UserLoginTest {
             assertEquals(testAuth, loginAuth, "Auth must be for logged in user");
 
         }
-        catch (ServiceException e){
+        catch (Exception e){
             fail("Should not fail during test: " + e.getMessage());
         }
 

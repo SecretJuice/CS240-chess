@@ -20,7 +20,7 @@ public class LocalUserDAO implements DataAccessObject<UserData>{
     public void create(UserData userData) throws DataAccessException {
 
         if (users.containsKey(userData.username())){
-            throw new DataAccessException("User already exists");
+            throw new ItemAlreadyExistsException("User already exists");
         }
 
         users.put(userData.username(), userData);

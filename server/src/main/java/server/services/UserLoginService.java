@@ -4,6 +4,7 @@ import dataAccess.DataAccessObject;
 import model.AuthData;
 import model.UserData;
 import server.DataFactory;
+import server.requests.UnauthorizedException;
 
 import java.util.Objects;
 
@@ -22,26 +23,20 @@ public class UserLoginService extends Service{
     }
 
 
-    public AuthData loginUser(UserData userData) throws ServiceException{
+    public AuthData loginUser(UserData userData) throws Exception{
 
-        try{
 
-            UserData existingUser = userDAO.get(userData.username());
+        UserData existingUser = userDAO.get(userData.username());
 
-            if (existingUser == null){
-                throw new ServiceException("User does not exist");
-            }
-
-            if (!Objects.equals(existingUser.password(), userData.password())){
-                throw new ServiceException("Password is incorrect");
-            }
-
-            return createSession(userData, authDAO, authFactory);
-
+        if (existingUser == null){
+            throw new UnauthorizedException("User does not exist");
         }
-        catch (Exception e) {
-            throw new ServiceException(e.getMessage());
+
+        if (!Objects.equals(existingUser.password(), userData.password())){
+            throw new UnauthorizedException("Password is incorrect");
         }
+
+        return createSession(userData, authDAO, authFactory);
 
     }
 

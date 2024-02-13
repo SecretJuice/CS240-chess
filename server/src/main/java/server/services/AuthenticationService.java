@@ -2,6 +2,7 @@ package server.services;
 
 import dataAccess.DataAccessObject;
 import model.AuthData;
+import server.requests.UnauthorizedException;
 
 public class AuthenticationService extends Service{
 
@@ -11,21 +12,15 @@ public class AuthenticationService extends Service{
         authDAO = authDataAccess;
     }
 
-    public AuthData authenticateSession(String authToken) throws ServiceException{
+    public AuthData authenticateSession(String authToken) throws Exception{
 
-        try {
-            AuthData session = authDAO.get(authToken);
+        AuthData session = authDAO.get(authToken);
 
-            if (session != null){
-                return session;
-            }
-            else {
-                throw new ServiceException("Session not found");
-            }
-
+        if (session != null){
+            return session;
         }
-        catch (Exception e){
-            throw new ServiceException("[Invalid Session]: " + e.getMessage());
+        else {
+            throw new UnauthorizedException("Session not found");
         }
 
     }

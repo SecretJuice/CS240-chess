@@ -2,9 +2,11 @@ package server.services;
 
 import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
+import dataAccess.ItemAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
 import server.DataFactory;
+import server.requests.ForbiddenException;
 
 public class UserRegistrationService extends Service{
 
@@ -20,16 +22,16 @@ public class UserRegistrationService extends Service{
 
     }
 
-    public AuthData registerUser(UserData userData) throws ServiceException{
+    public AuthData registerUser(UserData userData) throws Exception{
 
-        try {
+        try{
             userDAO.create(userData);
+        }
+        catch (ItemAlreadyExistsException e){
+            throw new ForbiddenException("Username already taken");
+        }
 
-            return createSession(userData, authDAO, authFactory);
-        }
-        catch (DataAccessException e){
-            throw new ServiceException(e.getMessage());
-        }
+        return createSession(userData, authDAO, authFactory);
 
     }
 

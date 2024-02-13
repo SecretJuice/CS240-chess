@@ -5,17 +5,24 @@ import dataAccess.LocalAuthDAO;
 import dataAccess.LocalGameDAO;
 import dataAccess.LocalUserDAO;
 import server.services.ApplicationClearService;
+import spark.Request;
+import spark.Response;
 
 public class ClearAppHandler extends Handler{
 
+
     @Override
-    public String handleRequest() throws DataAccessException {
-        System.out.println("Clearing Application");
+    public Object handle(Request request, Response response) throws Exception {
 
-        new ApplicationClearService(new LocalUserDAO(), new LocalAuthDAO(), new LocalGameDAO()).clearApplication();
+        System.out.println("ClearAppHandler called");
 
-        String yourmom = "{\"response\": \"Cleared App\"}";
+        ApplicationClearService service = new ApplicationClearService(new LocalUserDAO(), new LocalAuthDAO(), new LocalGameDAO());
 
-        return yourmom;
+        service.clearApplication();
+
+        response.status(200);
+        return "";
+
+
     }
 }

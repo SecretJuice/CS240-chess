@@ -1,20 +1,70 @@
 package server.handlers;
 
+import com.google.gson.Gson;
 import dataAccess.LocalAuthDAO;
 import dataAccess.LocalUserDAO;
 import model.AuthData;
 import model.UserData;
 import server.AuthFactoryRandomToken;
+import server.requests.BadRequestException;
+import server.requests.RegisterUserRequest;
 import server.services.UserRegistrationService;
+import spark.Request;
+import spark.Response;
 
 public class RegisterHandler extends Handler{
+
     @Override
-    public String handleRequest(){
+    public Object handle(Request request, Response response) throws Exception {
 
-        UserData userData = new UserData("Yourmom", "password1234", "yourmom@mom.com");
+        RegisterUserRequest registerRequest = parseRequest(request.body());
 
-//        AuthData authData = new UserRegistrationService().registerUser(userData, new LocalUserDAO(), new LocalAuthDAO(), new AuthFactoryRandomToken());
+        UserRegistrationService service = new UserRegistrationService(new LocalUserDAO(), new LocalAuthDAO(), new AuthFactoryRandomToken());
 
-        return String.format("{\"authToken\":\"{%s}\"}", "authData.authToken()");
+        UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+
+        AuthData newAuth = service.registerUser(newUser);
+
+        return encodeAuthData(newAuth);
+    }
+
+    private String encodeAuthData(AuthData data) throws Exception{
+
+        try{
+
+            Gson parser = new Gson();
+            return parser.toJson(data);
+
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+
+    }
+
+    private RegisterUserRequest parseRequest(String json) throws BadRequestException {
+
+        try{
+
+            Gson parser = new Gson();
+            RegisterUserRequest request = parser.fromJson(json, RegisterUserRequest.class);
+
+            if (request.username() == null){
+                throw new BadRequestException("Missing Username");
+            }
+            else if (request.password() == null){
+                throw new BadRequestException("Missing Password");
+            }
+            else if (request.email() == null){
+                throw new BadRequestException("Missing Email");
+            }
+
+            return request;
+
+        }
+        catch (Exception e){
+            throw new BadRequestException(e.getMessage());
+        }
+
     }
 }
