@@ -14,8 +14,6 @@ public class ClearAppHandler extends Handler{
     @Override
     public Object handle(Request request, Response response) throws Exception {
 
-        System.out.println("ClearAppHandler called");
-
         ApplicationClearService service = new ApplicationClearService(new LocalUserDAO(), new LocalAuthDAO(), new LocalGameDAO());
 
         service.clearApplication();
