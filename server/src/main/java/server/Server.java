@@ -33,7 +33,7 @@ public class Server {
         Spark.delete("/session", (req, res) -> new LogoutHandler().handle(req, res)); //Logout
         Spark.get("/game", (req, res) -> new ListGameHandler().handle(req, res)); //List Games
         Spark.post("/game", (req, res) -> new CreateGameHandler().handle(req, res)); //Create Game
-        Spark.put("/game", (req, res) -> new Handler().handle(req, res)); //Join Game
+        Spark.put("/game", (req, res) -> new JoinGameHandler().handle(req, res)); //Join Game
 
     }
 
