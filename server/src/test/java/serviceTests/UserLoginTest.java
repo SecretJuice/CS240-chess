@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.services.ServiceException;
+import server.requests.UnauthorizedException;
 import server.services.UserLoginService;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,7 +68,7 @@ public class UserLoginTest {
 
         UserData loginUser = new UserData("NonexistentUser", "password", null);
 
-        assertThrows(ServiceException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw ServiceException with message: 'User does not exist'");
+        assertThrows(UnauthorizedException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw UnauthorizedException with message: 'User does not exist'");
 
     }
 
@@ -78,7 +78,7 @@ public class UserLoginTest {
 
         UserData loginUser = new UserData("NewUser", "1234", null);
 
-        assertThrows(ServiceException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw ServiceException with message: 'Password is incorrect'");
+        assertThrows(UnauthorizedException.class, () -> new UserLoginService(userDAO, authDAO, authFactory).loginUser(loginUser), "Should throw UnauthorizedException with message: 'Password is incorrect'");
 
     }
 

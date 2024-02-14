@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.services.ServiceException;
+import server.requests.ForbiddenException;
 import server.services.UserRegistrationService;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class UserRegistrationTest {
             userDAO.create(newUser);
         }catch (Exception e){}
 
-        assertThrows(ServiceException.class, () -> new UserRegistrationService(userDAO, authDAO, authFactory).registerUser(newUser), "Should throw a ServiceException");
+        assertThrows(ForbiddenException.class, () -> new UserRegistrationService(userDAO, authDAO, authFactory).registerUser(newUser), "Should throw a ForbiddenException");
 
         AuthData authData;
         Collection<AuthData> sessions = new ArrayList<>();

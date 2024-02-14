@@ -9,8 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.DataFactory;
 import server.GameFactoryHashName;
+import server.requests.BadRequestException;
 import server.services.GameCreationService;
-import server.services.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,7 +63,7 @@ public class GameCreationTest {
             fail("Test setup should not throw exceptions: " + e.getMessage());
         }
 
-        assertThrows(ServiceException.class, () -> new GameCreationService(gameDAO, gameFactory).createGame("TestGame"));
+        assertThrows(BadRequestException.class, () -> new GameCreationService(gameDAO, gameFactory).createGame("TestGame"), "Should throw BadRequestException when trying to create a game that already exists");
 
     }
 

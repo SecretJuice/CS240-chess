@@ -34,7 +34,7 @@ public class LocalUserDAO implements DataAccessObject<UserData>{
     public void update(UserData userData) throws DataAccessException {
 
         if (!users.containsKey(userData.username())){
-            throw new DataAccessException("User not found");
+            throw new ItemNotFoundException("User not found");
         }
 
         users.replace(userData.username(), userData);
@@ -43,7 +43,7 @@ public class LocalUserDAO implements DataAccessObject<UserData>{
     @Override
     public void delete(String username) throws DataAccessException {
         if (!users.containsKey(username)){
-            throw new DataAccessException("User not found");
+            throw new ItemNotFoundException("User not found");
         }
 
         users.remove(username);

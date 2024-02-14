@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.services.ServiceException;
+import server.requests.UnauthorizedException;
 import server.services.UserLogoutService;
 import server.services.UserRegistrationService;
 
@@ -62,7 +62,7 @@ public class UserLogoutTest {
 
         AuthData testAuth = authFactory.createData("NewUser");
 
-        assertThrows(ServiceException.class, () -> new UserLogoutService(authDOA).logoutUser(testAuth));
+        assertThrows(UnauthorizedException.class, () -> new UserLogoutService(authDOA).logoutUser(testAuth), "Should throw UnauthorizedException when logging out of a non-existent session");
 
     }
 

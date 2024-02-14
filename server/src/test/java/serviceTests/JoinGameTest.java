@@ -11,10 +11,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.GameFactoryHashName;
+import server.requests.BadRequestException;
+import server.requests.ForbiddenException;
 import server.requests.JoinGameRequest;
+import server.requests.UnauthorizedException;
 import server.services.JoinGameService;
-import server.services.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,7 +71,7 @@ public class JoinGameTest {
             AuthData testSession = authFactory.createData("testUser");
             JoinGameRequest testRequest = new JoinGameRequest(123, ChessGame.TeamColor.BLACK);
 
-            assertThrows(ServiceException.class, () -> new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw ServiceException because the desired slot is already taken");
+            assertThrows(ForbiddenException.class, () -> new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw ForbiddenException because the desired slot is already taken");
 
 
         }
@@ -88,7 +89,7 @@ public class JoinGameTest {
             AuthData testSession = authFactory.createData("testUser");
             JoinGameRequest testRequest = new JoinGameRequest(123, ChessGame.TeamColor.BLACK);
 
-            assertThrows(ServiceException.class, () ->  new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw ServiceException because the game doesn't exist");
+            assertThrows(BadRequestException.class, () ->  new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw BadRequestException because the game doesn't exist");
         }
         catch (Exception e){
             fail("Test setup should not throw exceptions: " + e.getMessage());
@@ -108,7 +109,7 @@ public class JoinGameTest {
             AuthData testSession = null;
             JoinGameRequest testRequest = new JoinGameRequest(123, ChessGame.TeamColor.BLACK);
 
-            assertThrows(ServiceException.class, () ->  new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw ServiceException because there's no session");
+            assertThrows(UnauthorizedException.class, () ->  new JoinGameService(gameDAO).joinGame(testRequest, testSession), "Should throw UnauthorizedException because there's no session");
         }
         catch (Exception e){
             fail("Test setup should not throw exceptions: " + e.getMessage());

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.services.GameBrowserService;
-import server.services.ServiceException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,7 +50,16 @@ public class GameBrowserTest {
     @DisplayName("Empty Games List")
     void emptyGamesListTest(){
 
-        assertThrows(ServiceException.class, () -> new GameBrowserService(gameDAO).getGameList(), "ServiceException should be thrown when there are no games.");
+        try{
+
+            Collection<GameData> games = new GameBrowserService(gameDAO).getGameList();
+
+            assertTrue(games.isEmpty(), "GameBrowserService.getGameList() should return an empty collection");
+        }
+        catch (Exception e){
+            fail("Should not throw exception during test: " + e.getMessage());
+        }
+
     }
 
 }

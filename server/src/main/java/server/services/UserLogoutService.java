@@ -1,7 +1,9 @@
 package server.services;
 
 import dataAccess.DataAccessObject;
+import dataAccess.ItemNotFoundException;
 import model.AuthData;
+import server.requests.UnauthorizedException;
 
 public class UserLogoutService extends Service{
 
@@ -11,15 +13,13 @@ public class UserLogoutService extends Service{
         authDOA = authDataAccess;
     }
 
-    public void logoutUser (AuthData authData) throws ServiceException{
+    public void logoutUser (AuthData authData) throws Exception{
 
         try{
-
             authDOA.delete(authData.authToken());
-
         }
-        catch (Exception e){
-            throw new ServiceException("Failed to logout: " + e.getMessage());
+        catch (ItemNotFoundException e){
+            throw new UnauthorizedException("No session to delete: " + e.getMessage());
         }
     }
 }

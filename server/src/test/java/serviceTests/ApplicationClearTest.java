@@ -59,7 +59,7 @@ public class ApplicationClearTest {
             assertIterableEquals(emptyGames, games, "Games should be empty after clearApplication()");
 
         }
-        catch (DataAccessException e){
+        catch (Exception e){
             fail("Should not throw exception: " + e.getMessage());
         }
 

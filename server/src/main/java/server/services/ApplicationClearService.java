@@ -18,7 +18,7 @@ public class ApplicationClearService {
         gameDAO = gameDataAccess;
     }
 
-    public void clearApplication() throws DataAccessException {
+    public void clearApplication() throws Exception {
 
         userDAO.clear();
         authDAO.clear();

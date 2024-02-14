@@ -9,8 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
+import server.requests.UnauthorizedException;
 import server.services.AuthenticationService;
-import server.services.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +50,7 @@ public class AuthenticationTest {
     @DisplayName("Invalid Session")
     void invalidSessionTest() {
 
-        assertThrows(ServiceException.class, () -> new AuthenticationService(authDAO).authenticateSession("faketoken"));
+        assertThrows(UnauthorizedException.class, () -> new AuthenticationService(authDAO).authenticateSession("faketoken"));
 
     }
 }

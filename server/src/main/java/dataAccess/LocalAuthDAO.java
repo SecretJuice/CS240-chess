@@ -15,7 +15,7 @@ public class LocalAuthDAO implements DataAccessObject<AuthData>{
 
     public void create(AuthData authData) throws DataAccessException {
         if (sessions.containsKey(authData.authToken())){
-            throw new DataAccessException("Auth token already exists");
+            throw new ItemAlreadyExistsException("Auth token already exists");
         }
 
         sessions.put(authData.authToken(), authData);
@@ -27,13 +27,13 @@ public class LocalAuthDAO implements DataAccessObject<AuthData>{
 
     public void update(AuthData authData) throws DataAccessException{
         if (!sessions.containsKey(authData.authToken())){
-            throw new DataAccessException("Session does not exist");
+            throw new ItemNotFoundException("Session does not exist");
         }
     }
 
     public void delete(String authToken) throws DataAccessException {
         if (!sessions.containsKey(authToken)){
-            throw new DataAccessException("Session does not exist");
+            throw new ItemNotFoundException("Session does not exist");
         }
 
         sessions.remove(authToken);

@@ -16,7 +16,7 @@ public class LocalGameDAO implements DataAccessObject<GameData>{
     public void create(GameData gameData) throws DataAccessException {
 
         if (games.containsKey(gameData.gameID())){
-            throw new DataAccessException(String.format("Game with ID: {%s} already exists", gameData.gameID()));
+            throw new ItemAlreadyExistsException(String.format("Game with ID: {%s} already exists", gameData.gameID()));
         }
 
         games.put(gameData.gameID(), gameData);
@@ -35,7 +35,7 @@ public class LocalGameDAO implements DataAccessObject<GameData>{
     public void update(GameData gameData) throws DataAccessException {
 
         if (!games.containsKey(gameData.gameID())){
-            throw new DataAccessException(String.format("Game with ID: {%s} was not found", gameData.gameID()));
+            throw new ItemNotFoundException(String.format("Game with ID: {%s} was not found", gameData.gameID()));
         }
 
         games.replace(gameData.gameID(), gameData);
@@ -45,7 +45,7 @@ public class LocalGameDAO implements DataAccessObject<GameData>{
     public void delete(String gameID) throws DataAccessException {
 
         if (!games.containsKey(Integer.parseInt(gameID))){
-            throw new DataAccessException(String.format("Game with ID: {%s} was not found", gameID));
+            throw new ItemNotFoundException(String.format("Game with ID: {%s} was not found", gameID));
         }
 
         games.remove(gameID);

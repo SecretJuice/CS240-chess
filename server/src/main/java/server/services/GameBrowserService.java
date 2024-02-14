@@ -14,7 +14,7 @@ public class GameBrowserService extends Service{
         gameDAO = gameDataAccess;
     }
 
-    public Collection<GameData> getGameList() throws ServiceException{
+    public Collection<GameData> getGameList() throws Exception{
 
         try{
             Collection<GameData> games = new ArrayList<>(gameDAO.getAll());
@@ -29,7 +29,7 @@ public class GameBrowserService extends Service{
             return games;
         }
         catch (Exception e){
-            throw new ServiceException("Could not get games: " + e.getMessage());
+            throw new Exception("Could not get games: " + e.getMessage());
         }
 
     }

@@ -2,8 +2,10 @@ package server.services;
 
 import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
+import dataAccess.ItemAlreadyExistsException;
 import model.GameData;
 import server.DataFactory;
+import server.requests.BadRequestException;
 
 public class GameCreationService extends Service{
 
@@ -16,19 +18,19 @@ public class GameCreationService extends Service{
     }
 
 
-    public GameData createGame (String gameName) throws ServiceException{
+    public GameData createGame (String gameName) throws Exception{
 
-        try {
             GameData newGame = gameFactory.createData(gameName);
 
-            gameDAO.create(newGame);
+            try {
+                gameDAO.create(newGame);
+            }
+            catch (ItemAlreadyExistsException e){
+                throw new BadRequestException("Could not create game: " + e.getMessage());
+            }
 
             return newGame;
 
-        }
-        catch (Exception e){
-            throw new ServiceException("Could not create game: " + e.getMessage());
-        }
     }
 
 }
