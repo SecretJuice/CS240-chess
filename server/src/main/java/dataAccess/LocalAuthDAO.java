@@ -5,6 +5,10 @@ import model.AuthData;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * DataAccessObject for storing AuthData objects (sessions).
+ * Stores objects in memory via HashMap
+ */
 public class LocalAuthDAO implements DataAccessObject<AuthData>{
 
     private static HashMap<String, AuthData> sessions = new HashMap<>();

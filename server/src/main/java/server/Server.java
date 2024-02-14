@@ -37,6 +37,9 @@ public class Server {
 
     }
 
+    /**
+     * Initializes exception handling
+     */
     private void mapExceptions(){
 
         Spark.exception(UnauthorizedException.class, (e, req, res) -> {

@@ -5,6 +5,10 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * DataAccessObject for storing GameData objects (matches).
+ * Stores objects in memory via HashMap
+ */
 public class LocalGameDAO implements DataAccessObject<GameData>{
 
     private static HashMap<Integer, GameData> games = new HashMap<>();

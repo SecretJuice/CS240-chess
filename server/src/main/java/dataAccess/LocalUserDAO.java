@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * DataAccessObject for storing UserData objects (users).
+ * Stores objects in memory via HashMap
+ */
 public class LocalUserDAO implements DataAccessObject<UserData>{
 
     private static HashMap<String, UserData> users = new HashMap<>();
