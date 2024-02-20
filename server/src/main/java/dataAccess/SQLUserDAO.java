@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class SQLUserDAO implements DataAccessObject<UserData>{
@@ -44,8 +45,8 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
 
         String sql =
             """
-            INSERT INTO users (username, password_hash, email) VALUES 
-            (?, ?, ?);
+            INSERT INTO users (username, password_hash, email) 
+            VALUES (?, ?, ?);
             """;
 
         try(PreparedStatement statement = connection.prepareStatement(sql)){
@@ -74,9 +75,9 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
         String sql =
             """
             SELECT
-                users.username AS username,
+                users.username      AS username,
                 users.password_hash AS password,
-                users.email AS email
+                users.email         AS email
             FROM
                 users
             WHERE
@@ -110,17 +111,104 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
 
     public void update(UserData data) throws DataAccessException {
 
+        String sql =
+                """
+                UPDATE users SET
+                password_hash = ?, email = ?
+                WHERE username = ?;
+                """;
+
+        int resultCode = 0;
+
+        try(PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setString(1, data.password());
+            statement.setString(2, data.email());
+
+            statement.setString(3, data.username());
+
+            resultCode = statement.executeUpdate();
+        }
+        catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+
+        if (resultCode == 0) {
+            throw new ItemNotFoundException("User doesn't exist");
+        }
     }
 
     public void delete(String key) throws DataAccessException {
 
+        String sql =
+                """
+                DELETE FROM users WHERE username = ?;
+                """;
+
+        int resultCode = 0;
+
+        try(PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setString(1, key);
+
+            resultCode = statement.executeUpdate();
+        }
+        catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+
+        if (resultCode == 0){
+            throw new ItemNotFoundException("User doesn't exist");
+        }
+
     }
 
     public void clear() throws DataAccessException {
-
+        String sql =
+                """
+                TRUNCATE IF EXISTS users;
+                """;
+        try{
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.execute();
+        }
+        catch(SQLException e){
+            throw new DataAccessException("Could not clear table: " + e.getMessage());
+        }
     }
 
     public Collection<UserData> getAll() throws DataAccessException {
-        return null;
+
+        String sql =
+                """
+                SELECT
+                    users.username      AS username,
+                    users.password_hash AS password,
+                    users.email         AS email
+                FROM
+                    users;
+                """;
+
+        try(PreparedStatement statement = connection.prepareStatement(sql)){
+
+            ResultSet results = statement.executeQuery();
+
+            Collection<UserData> data = new ArrayList<>();
+
+            while(results.next()) {
+
+                UserData result = new UserData(
+                        results.getString("username"),
+                        results.getString("password"),
+                        results.getString("email"));
+
+                data.add(result);
+            }
+
+            return data;
+
+        }
+        catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+
     }
 }
