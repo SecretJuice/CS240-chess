@@ -2,44 +2,26 @@ package dataAccess;
 
 import model.UserData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SQLUserDAO implements DataAccessObject<UserData>{
+public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<UserData>{
 
-    private Connection connection = null;
-    public SQLUserDAO(SQLConnector connector) throws DataAccessException{
-        connection = connector.openConnection();
-        initializeTable();
+    public SQLUserDAO(String connectionURL) throws DataAccessException{
+
+        super(connectionURL);
+        super.tableSQL =
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    username VARCHAR(30) NOT NULL UNIQUE,
+                    password_hash VARCHAR(255) NOT NULL,
+                    email VARCHAR(50),
+                    PRIMARY KEY (username)
+                );
+                """;
     }
 
-    private void initializeTable() throws DataAccessException{
-
-        String sql =
-            """
-            CREATE DATABASE IF NOT EXISTS chess;
-            USE chess;
-            CREATE TABLE IF NOT EXISTS users (
-                uuid VARCHAR(36) NOT NULL UNIQUE,
-                username VARCHAR(30) NOT NULL UNIQUE,
-                password_hash VARCHAR(255) NOT NULL,
-                email VARCHAR(50),
-                PRIMARY KEY (uuid)
-            );
-            """;
-
-        try{
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.execute();
-        }
-        catch(SQLException e){
-            throw new DataAccessException("Could not initialize table: " + e.getMessage());
-        }
-    }
 
     public void create(UserData data) throws DataAccessException {
 
@@ -49,7 +31,8 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
             VALUES (?, ?, ?);
             """;
 
-        try(PreparedStatement statement = connection.prepareStatement(sql)){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setString(1, data.username());
             statement.setString(2, data.password());
@@ -65,9 +48,7 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
             else{
                 throw new DataAccessException(e.getMessage());
             }
-
         }
-
     }
 
     public UserData get(String key) throws DataAccessException {
@@ -84,7 +65,8 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
                 users.username = ?;
             """;
 
-        try(PreparedStatement statement = connection.prepareStatement(sql)){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setString(1, key);
 
@@ -106,7 +88,6 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
         catch(SQLException e){
             throw new DataAccessException(e.getMessage());
         }
-
     }
 
     public void update(UserData data) throws DataAccessException {
@@ -120,7 +101,9 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = connection.prepareStatement(sql)){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+
             statement.setString(1, data.password());
             statement.setString(2, data.email());
 
@@ -146,7 +129,8 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = connection.prepareStatement(sql)){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setString(1, key);
 
             resultCode = statement.executeUpdate();
@@ -158,15 +142,15 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
         if (resultCode == 0){
             throw new ItemNotFoundException("User doesn't exist");
         }
-
     }
 
     public void clear() throws DataAccessException {
         String sql =
                 """
-                TRUNCATE IF EXISTS users;
+                TRUNCATE users;
                 """;
-        try{
+        try(Connection connection = getConnection()){
+
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.execute();
         }
@@ -187,7 +171,8 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
                     users;
                 """;
 
-        try(PreparedStatement statement = connection.prepareStatement(sql)){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
 
             ResultSet results = statement.executeQuery();
 
@@ -202,13 +187,10 @@ public class SQLUserDAO implements DataAccessObject<UserData>{
 
                 data.add(result);
             }
-
             return data;
-
         }
         catch(SQLException e){
             throw new DataAccessException(e.getMessage());
         }
-
     }
 }
