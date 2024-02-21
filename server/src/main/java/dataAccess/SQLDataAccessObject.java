@@ -17,8 +17,9 @@ public abstract class SQLDataAccessObject {
                
             """;
 
-    public SQLDataAccessObject(String connectionUrl) throws DataAccessException{
+    public SQLDataAccessObject(String connectionUrl, String tableDDL) throws DataAccessException{
         URL = connectionUrl;
+        tableSQL = tableDDL;
         initializeTable();
     }
 
@@ -27,20 +28,6 @@ public abstract class SQLDataAccessObject {
     }
 
     private void initializeTable() throws DataAccessException{
-
-        String dbSQL =
-                """
-                CREATE DATABASE IF NOT EXISTS chess;
-                """;
-        String tableSQL =
-                """    
-                CREATE TABLE IF NOT EXISTS users (
-                    username VARCHAR(30) NOT NULL UNIQUE,
-                    password_hash VARCHAR(255) NOT NULL,
-                    email VARCHAR(50),
-                    PRIMARY KEY (username)
-                );
-                """;
 
         try(Connection connection = getConnection()
 
@@ -57,6 +44,11 @@ public abstract class SQLDataAccessObject {
         catch(SQLException e){
             throw new DataAccessException("Could not initialize table: " + e.getMessage());
         }
+    }
+
+    protected PreparedStatement prepareSQL(String sql) throws SQLException{
+        Connection connection = getConnection();
+        return connection.prepareStatement(sql);
     }
 
 }
