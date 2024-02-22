@@ -10,12 +10,12 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private int _posRow;
-    private int _posCol;
+    private int posRow;
+    private int posCol;
 
     public ChessPosition(int row, int col) {
-        _posRow = row;
-        _posCol = col;
+        posRow = row;
+        posCol = col;
     }
 
     /**
@@ -24,7 +24,7 @@ public class ChessPosition {
      */
     public int getRow() {
 //        throw new RuntimeException("Not implemented");
-        return _posRow;
+        return posRow;
     }
 
     /**
@@ -33,14 +33,14 @@ public class ChessPosition {
      */
     public int getColumn() {
 //        throw new RuntimeException("Not implemented");
-        return _posCol;
+        return posCol;
     }
 
     @Override
     public String toString() {
         return "ChessPosition{" +
-                 _posRow +
-                ", " + _posCol +
+                posRow +
+                ", " + posCol +
                 '}';
     }
 
@@ -49,11 +49,11 @@ public class ChessPosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPosition that = (ChessPosition) o;
-        return _posRow == that._posRow && _posCol == that._posCol;
+        return posRow == that.posRow && posCol == that.posCol;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_posRow, _posCol);
+        return Objects.hash(posRow, posCol);
     }
 }

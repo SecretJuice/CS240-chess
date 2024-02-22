@@ -10,15 +10,15 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private final ChessPosition _startPos;
-    private final ChessPosition _endPos;
-    private final ChessPiece.PieceType _promotionPiece;
+    private final ChessPosition startPos;
+    private final ChessPosition endPos;
+    private final ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
-        _startPos = startPosition;
-        _endPos = endPosition;
-        _promotionPiece = promotionPiece;
+        startPos = startPosition;
+        endPos = endPosition;
+        this.promotionPiece = promotionPiece;
     }
 
     /**
@@ -26,7 +26,7 @@ public class ChessMove {
      */
     public ChessPosition getStartPosition() {
 //        throw new RuntimeException("Not implemented");
-        return _startPos;
+        return startPos;
     }
 
     /**
@@ -34,7 +34,7 @@ public class ChessMove {
      */
     public ChessPosition getEndPosition() {
 //        throw new RuntimeException("Not implemented");
-        return _endPos;
+        return endPos;
     }
 
     /**
@@ -45,12 +45,12 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
 //        throw new RuntimeException("Not implemented");
-        return _promotionPiece;
+        return promotionPiece;
     }
 
     public String toString(){
-        return String.format("[%d,%d] -> [%d,%d](%s)", _startPos.getRow(), _startPos.getColumn(),
-                                                   _endPos.getRow(), _endPos.getColumn(), _promotionPiece);
+        return String.format("[%d,%d] -> [%d,%d](%s)", startPos.getRow(), startPos.getColumn(),
+                                                   endPos.getRow(), endPos.getColumn(), promotionPiece);
     }
 
     //add custom hashing
@@ -60,11 +60,11 @@ public class ChessMove {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(_startPos, chessMove._startPos) && Objects.equals(_endPos, chessMove._endPos) && _promotionPiece == chessMove._promotionPiece;
+        return Objects.equals(startPos, chessMove.startPos) && Objects.equals(endPos, chessMove.endPos) && promotionPiece == chessMove.promotionPiece;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_startPos, _endPos, _promotionPiece);
+        return Objects.hash(startPos, endPos, promotionPiece);
     }
 }

@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
  */
 public class ChessGame {
 
-    private ChessBoard _board;
-    private TeamColor _currentTeamTurn;
+    private ChessBoard chessBoard;
+    private TeamColor currentTeamTurn;
 
     public ChessGame() {
-        _board = new ChessBoard();
+        chessBoard = new ChessBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return _currentTeamTurn;
+        return currentTeamTurn;
     }
 
     /**
@@ -32,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        _currentTeamTurn = team;
+        currentTeamTurn = team;
     }
 
     /**
@@ -61,8 +61,6 @@ public class ChessGame {
         validMoves.addAll(piece.pieceMoves(getBoard(), startPosition));
 
         validMoves = (HashSet<ChessMove>) validMoves.stream().filter(move -> filterMoveForCheck(move, piece.getTeamColor())).collect(Collectors.toSet());
-
-//        System.out.println(validMoves);
 
         return validMoves;
     }
@@ -110,6 +108,7 @@ public class ChessGame {
         }
 
         ChessPiece movedPiece = new ChessPiece(movingPiece.getTeamColor(), promotionType, true);
+        movedPiece.setHasMoved(true);
 
         board.addPiece(move.getEndPosition(), movedPiece);
     }
@@ -121,7 +120,6 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-//        throw new RuntimeException("Not implemented");
 
         HashSet<ChessMove> enemyMoves = new HashSet<>();
         ChessPosition kingPosition = getTeamKingPosition(getBoard(), teamColor);
@@ -180,11 +178,6 @@ public class ChessGame {
                 virtualBoard.addPiece(position, piece);
             }
         }
-
-//        System.out.println("GAME BOARD:\n");
-//        System.out.println(currentBoard);
-//        System.out.println("VIRTUAL BOARD:\n");
-//        System.out.println(virtualBoard);
 
         return virtualBoard;
     }
@@ -249,7 +242,6 @@ public class ChessGame {
             }
         }
 
-//        System.out.println(validMoves);
 
         return validMoves;
     }
@@ -279,7 +271,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        _board = board;
+        chessBoard = board;
     }
 
     /**
@@ -288,6 +280,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return _board;
+        return chessBoard;
     }
 }

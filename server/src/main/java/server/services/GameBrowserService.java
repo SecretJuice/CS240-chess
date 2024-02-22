@@ -19,13 +19,6 @@ public class GameBrowserService extends Service{
         try{
             Collection<GameData> games = new ArrayList<>(gameDAO.getAll());
 
-//            if (games.isEmpty()){
-//                throw new ServiceException("No games exist at this time");
-//            }
-//            else{
-//                return games;
-//            }
-
             return games;
         }
         catch (Exception e){

@@ -12,22 +12,22 @@ import java.util.*;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor _color;
-    private final ChessPiece.PieceType _type;
+    private final ChessGame.TeamColor color;
+    private final ChessPiece.PieceType pieceType;
 
-    private boolean _hasMoved;
+    private boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, boolean hasMoved) {
-        _color = pieceColor;
-        _type = type;
-        _hasMoved = hasMoved;
+        color = pieceColor;
+        pieceType = type;
+        this.hasMoved = hasMoved;
 
     }
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        _color = pieceColor;
-        _type = type;
-        _hasMoved = false;
+        color = pieceColor;
+        pieceType = type;
+        hasMoved = false;
     }
 
     /**
@@ -47,24 +47,24 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-//        throw new RuntimeException("Not implemented");
-        return _color;
+
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-//        throw new RuntimeException("Not implemented");
-        return _type;
+
+        return pieceType;
     }
 
     public boolean getHasMoved(){
-        return _hasMoved;
+        return hasMoved;
     }
 
     public void setHasMoved(boolean bool){
-        _hasMoved = bool;
+        hasMoved = bool;
     }
 
     /**
@@ -76,7 +76,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        return switch (_type) {
+        return switch (pieceType) {
             case PieceType.BISHOP -> new BishopMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.ROOK -> new RookMoveFinder(this).pieceMoves(board, myPosition);
             case PieceType.QUEEN -> new QueenMoveFinder(this).pieceMoves(board, myPosition);
@@ -94,11 +94,11 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return _color == that._color && _type == that._type;
+        return color == that.color && pieceType == that.pieceType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_color, _type);
+        return Objects.hash(color, pieceType);
     }
 }
