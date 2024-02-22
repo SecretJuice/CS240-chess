@@ -10,10 +10,10 @@ import java.util.HashSet;
 
 public abstract class PieceMoveFinder {
 
-    protected ChessPiece _thisPiece;
+    protected ChessPiece thisPiece;
 
     public PieceMoveFinder(ChessPiece piece){
-        _thisPiece = piece;
+        thisPiece = piece;
     }
     protected enum PosCheckResult{
         EMPTY,
@@ -34,7 +34,7 @@ public abstract class PieceMoveFinder {
         if (checkedPiece == null){
             return PosCheckResult.EMPTY;
         }
-        else if (checkedPiece.getTeamColor() != _thisPiece.getTeamColor()){
+        else if (checkedPiece.getTeamColor() != thisPiece.getTeamColor()){
             return PosCheckResult.CAPTURABLE;
         }
         else {
