@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -11,9 +10,9 @@ import java.util.Collection;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] _board;
+    private ChessPiece[][] board;
     public ChessBoard() {
-        _board = new ChessPiece[8][8];
+        board = new ChessPiece[8][8];
     }
 
     /**
@@ -24,7 +23,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
 //        throw new RuntimeException("Not implemented");
-        _board[position.getColumn()-1][position.getRow()-1] = piece;
+        board[position.getColumn()-1][position.getRow()-1] = piece;
     }
 
     /**
@@ -35,7 +34,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(int row, int column, ChessPiece piece) {
-        _board[column-1][row-1] = piece;
+        board[column-1][row-1] = piece;
     }
 
     /**
@@ -47,7 +46,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
 //        throw new RuntimeException("Not implemented");
-        return _board[position.getColumn()-1][position.getRow()-1];
+        return board[position.getColumn()-1][position.getRow()-1];
     }
 
     /**
@@ -133,11 +132,11 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(_board, that._board);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(_board);
+        return Arrays.deepHashCode(board);
     }
 }
