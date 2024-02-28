@@ -17,8 +17,8 @@ public class QueenMoveFinder extends PieceMoveFinder{
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
 
-        validMoves.addAll(new RookMoveFinder(_thisPiece).pieceMoves(board, myPosition));
-        validMoves.addAll(new BishopMoveFinder(_thisPiece).pieceMoves(board, myPosition));
+        validMoves.addAll(new RookMoveFinder(thisPiece).pieceMoves(board, myPosition));
+        validMoves.addAll(new BishopMoveFinder(thisPiece).pieceMoves(board, myPosition));
 
         return validMoves;
     }

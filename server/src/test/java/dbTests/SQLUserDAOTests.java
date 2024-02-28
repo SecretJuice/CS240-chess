@@ -1,6 +1,7 @@
 package dbTests;
 
 import dataAccess.*;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,9 @@ public class SQLUserDAOTests {
     void initializeTests() throws DataAccessException {
 
         DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+        DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
 
+        authDAO.clear();
         userDAO.clear();
 
     }

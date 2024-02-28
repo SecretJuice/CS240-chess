@@ -2,6 +2,7 @@ package dbTests;
 
 import dataAccess.*;
 import model.AuthData;
+import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +23,18 @@ public class SQLAuthDAOTests {
     void initializeTests() throws DataAccessException {
 
         DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+        DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
 
         authDAO.clear();
+        userDAO.clear();
+
+        UserData newUser = new UserData("TestUser", "password", "test@test.com");
+        UserData newUser1 = new UserData("TestUser1", "password", "test@test.com");
+        UserData newUser2 = new UserData("TestUser2", "password", "test@test.com");
+
+        userDAO.create(newUser);
+        userDAO.create(newUser1);
+        userDAO.create(newUser2);
 
     }
 

@@ -136,7 +136,7 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
 
         String sql =
                 """
-                TRUNCATE auths;
+                DELETE FROM auths;
                 """;
         try(PreparedStatement statement = prepareSQL(sql)){
 
@@ -152,8 +152,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
         String sql =
                 """
                 SELECT
-                    token      AS authToken
-                    username   AS username,
+                    token      AS authToken,
+                    username   AS username
                 FROM
                     auths;
                 """;

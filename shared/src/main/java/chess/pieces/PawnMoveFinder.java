@@ -13,7 +13,7 @@ public class PawnMoveFinder extends PieceMoveFinder{
     private Collection<ChessMove> checkPromotions(ChessPosition myPosition, ChessPosition newPosition){
         HashSet<ChessMove> validMoves = new HashSet<>();
 
-        if ((newPosition.getRow() == 8 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (newPosition.getRow() == 1 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)){
+        if ((newPosition.getRow() == 8 && thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE) || (newPosition.getRow() == 1 && thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK)){
             validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.QUEEN));
             validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.ROOK));
             validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
@@ -35,7 +35,7 @@ public class PawnMoveFinder extends PieceMoveFinder{
 
         int direction = 1;
 
-        if(_thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
+        if(thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
             direction = -1;
         }
 
@@ -49,7 +49,7 @@ public class PawnMoveFinder extends PieceMoveFinder{
 
             //And row check added because test cases don't account for whether a piece was already moved
 
-            if (!_thisPiece.getHasMoved() && ((myPosition.getRow()==2 && _thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE )||(myPosition.getRow()==7 && _thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK))){
+            if (!thisPiece.getHasMoved() && ((myPosition.getRow()==2 && thisPiece.getTeamColor() == ChessGame.TeamColor.WHITE )||(myPosition.getRow()==7 && thisPiece.getTeamColor() == ChessGame.TeamColor.BLACK))){
 
                 ChessPosition posTwoInFront = new ChessPosition(myPosition.getRow() + (direction * 2), myPosition.getColumn());
                 PosCheckResult posTwoInFrontResult = checkPosition(board, posTwoInFront);

@@ -142,7 +142,7 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
     public void clear() throws DataAccessException {
         String sql =
                 """
-                TRUNCATE users;
+                DELETE FROM users;
                 """;
         try(PreparedStatement statement = prepareSQL(sql)){
 

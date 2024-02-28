@@ -40,7 +40,6 @@ public class RookMoveFinder extends PieceMoveFinder{
 
         validMoves.addAll(traverseLaterally(board, myPosition, iterations, 0, -1));
 
-//        System.out.println(validMoves);
         return validMoves;
 
     }
