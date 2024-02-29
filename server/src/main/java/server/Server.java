@@ -33,7 +33,7 @@ public class Server {
     }
 
     /**
-     * Initializes all of the servers endpoints
+     * Initializes all the servers endpoints
      */
     private void registerEndpoints(){
         Spark.delete("/db", (req, res) -> new ClearAppHandler(userDAO, authDAO, gameDAO).handle(req, res)); //Clear Application

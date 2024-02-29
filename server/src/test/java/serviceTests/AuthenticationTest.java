@@ -3,6 +3,7 @@ package serviceTests;
 import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import dataAccess.LocalAuthDAO;
+import dataAccess.SQLAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,11 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthenticationTest {
 
-    private DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
+    private DataAccessObject<AuthData> authDAO;
     private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
     @BeforeEach
     void setup() throws DataAccessException {
+
+        authDAO = new SQLAuthDAO();
         authDAO.clear();
     }
 

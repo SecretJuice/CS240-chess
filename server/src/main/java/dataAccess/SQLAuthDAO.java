@@ -18,8 +18,7 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
                 CREATE TABLE IF NOT EXISTS auths (
                     token VARCHAR(36) NOT NULL UNIQUE,
                     username VARCHAR(30) NOT NULL,
-                    PRIMARY KEY (token),
-                    FOREIGN KEY (username) REFERENCES users(username)
+                    PRIMARY KEY (token)
                 );
                 """);
     }
