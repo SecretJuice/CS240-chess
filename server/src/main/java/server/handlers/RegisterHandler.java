@@ -2,10 +2,7 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.DataAccessObject;
-import dataAccess.LocalAuthDAO;
-import dataAccess.LocalUserDAO;
 import model.AuthData;
-import model.GameData;
 import model.UserData;
 import server.AuthFactoryRandomToken;
 import server.requests.BadRequestException;
@@ -19,7 +16,7 @@ public class RegisterHandler extends Handler{
     private final DataAccessObject<UserData> userDAO;
     private final DataAccessObject<AuthData> authDAO;
 
-    public RegisterHandler(DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO){
+    public RegisterHandler(DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO){
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }

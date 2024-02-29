@@ -1,5 +1,9 @@
 package server;
 
+import dataAccess.*;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 import server.handlers.*;
 import server.requests.BadRequestException;
 import server.requests.ForbiddenException;
@@ -10,12 +14,17 @@ import java.nio.file.Paths;
 
 public class Server {
 
+    private DataAccessObject<UserData> userDAO;
+    private DataAccessObject<AuthData> authDAO;
+    private DataAccessObject<GameData> gameDAO;
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        initializeDataAccess(false);
         registerEndpoints();
         mapExceptions();
 
@@ -27,13 +36,13 @@ public class Server {
      * Initializes all of the servers endpoints
      */
     private void registerEndpoints(){
-        Spark.delete("/db", (req, res) -> new ClearAppHandler().handle(req, res)); //Clear Application
-        Spark.post("/user", (req, res) -> new RegisterHandler().handle(req, res)); //Register User
-        Spark.post("/session", (req, res) -> new LoginHandler().handle(req, res)); //Login
-        Spark.delete("/session", (req, res) -> new LogoutHandler().handle(req, res)); //Logout
-        Spark.get("/game", (req, res) -> new ListGameHandler().handle(req, res)); //List Games
-        Spark.post("/game", (req, res) -> new CreateGameHandler().handle(req, res)); //Create Game
-        Spark.put("/game", (req, res) -> new JoinGameHandler().handle(req, res)); //Join Game
+        Spark.delete("/db", (req, res) -> new ClearAppHandler(userDAO, authDAO, gameDAO).handle(req, res)); //Clear Application
+        Spark.post("/user", (req, res) -> new RegisterHandler(userDAO, authDAO).handle(req, res)); //Register User
+        Spark.post("/session", (req, res) -> new LoginHandler(userDAO, authDAO).handle(req, res)); //Login
+        Spark.delete("/session", (req, res) -> new LogoutHandler(authDAO).handle(req, res)); //Logout
+        Spark.get("/game", (req, res) -> new ListGameHandler(authDAO, gameDAO).handle(req, res)); //List Games
+        Spark.post("/game", (req, res) -> new CreateGameHandler(authDAO, gameDAO).handle(req, res)); //Create Game
+        Spark.put("/game", (req, res) -> new JoinGameHandler(authDAO, gameDAO).handle(req, res)); //Join Game
 
     }
 
@@ -66,5 +75,27 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    void initializeDataAccess(boolean local){
+
+        try{
+            if (local){
+                userDAO = new LocalUserDAO();
+                authDAO = new LocalAuthDAO();
+                gameDAO = new LocalGameDAO();
+            }
+            else{
+                userDAO = new SQLUserDAO();
+                authDAO = new SQLAuthDAO();
+                gameDAO = new LocalGameDAO();
+            }
+        }
+        catch(DataAccessException e){
+            System.err.println("Could not initialize SQL Data Access: " + e.getMessage());
+            userDAO = new LocalUserDAO();
+            authDAO = new LocalAuthDAO();
+            gameDAO = new LocalGameDAO();
+        }
     }
 }
