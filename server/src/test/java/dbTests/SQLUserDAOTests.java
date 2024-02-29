@@ -13,13 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLUserDAOTests {
 
-    private final String url = "jdbc:mysql://localhost:3306/chess?user=root&password=password";
 
     @BeforeEach
     void initializeTests() throws DataAccessException {
 
-        DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
-        DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+        DataAccessObject<UserData> userDAO = new SQLUserDAO();
+        DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
         authDAO.clear();
         userDAO.clear();
@@ -31,7 +30,7 @@ public class SQLUserDAOTests {
     void testCreateRecord(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser = new UserData("TestUser", "password", "test@test.com");
 
@@ -51,7 +50,7 @@ public class SQLUserDAOTests {
     void testDuplicateRecord(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser = new UserData("TestUser", "password", "test@test.com");
 
@@ -70,7 +69,7 @@ public class SQLUserDAOTests {
     void testClearRecords(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser1 = new UserData("TestUser1", "password", "test@test.com");
             UserData newUser2 = new UserData("TestUser2", "password", "test@test.com");
@@ -95,7 +94,7 @@ public class SQLUserDAOTests {
     void testGetAllRecords(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser1 = new UserData("TestUser1", "password", "test@test.com");
             UserData newUser2 = new UserData("TestUser2", "password", "test@test.com");
@@ -121,7 +120,7 @@ public class SQLUserDAOTests {
     void testGetAllEmpty(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             Collection<UserData> users = userDAO.getAll();
 
@@ -139,7 +138,7 @@ public class SQLUserDAOTests {
     void testDeleteRecord(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser1 = new UserData("TestUser1", "password", "test@test.com");
 
@@ -163,7 +162,7 @@ public class SQLUserDAOTests {
     void testDeleteNonExistent(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             assertThrows(ItemNotFoundException.class, () -> userDAO.delete("TestUser1"), "Should throw ItemNotFoundException");
 
@@ -179,7 +178,7 @@ public class SQLUserDAOTests {
     void testUpdateRecord(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser1 = new UserData("TestUser1", "password", "test@test.com");
 
@@ -205,7 +204,7 @@ public class SQLUserDAOTests {
     void testUpdateNonExistent(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData fakeUser = new UserData("FakeUser", "password", "fake@test.com");
 
@@ -223,7 +222,7 @@ public class SQLUserDAOTests {
     void testGetSuccessfully(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData newUser = new UserData("TestUser1", "password", "test@test.com");
             userDAO.create(newUser);
@@ -243,7 +242,7 @@ public class SQLUserDAOTests {
     void testGetNonExistent(){
 
         try{
-            DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+            DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
             UserData user = userDAO.get("TestUser1");
 

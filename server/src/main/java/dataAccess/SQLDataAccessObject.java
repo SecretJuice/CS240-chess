@@ -7,37 +7,28 @@ import java.sql.SQLException;
 
 public abstract class SQLDataAccessObject {
 
-    private String URL = "";
-    protected String dbSQL =
-            """
-            CREATE DATABASE IF NOT EXISTS chess;
-            """;
     protected String tableSQL =
             """
                
             """;
 
-    public SQLDataAccessObject(String connectionUrl, String tableDDL) throws DataAccessException{
-        URL = connectionUrl;
+    public SQLDataAccessObject(String tableDDL) throws DataAccessException{
         tableSQL = tableDDL;
+        DatabaseManager.createDatabase();
         initializeTable();
     }
 
-    protected Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(URL);
+    protected Connection getConnection() throws DataAccessException{
+        return DatabaseManager.getConnection();
     }
 
     private void initializeTable() throws DataAccessException{
 
-        try(Connection connection = getConnection()
-
-        ){
-            PreparedStatement statement = connection.prepareStatement(dbSQL);
-            statement.execute();
+        try(Connection connection = getConnection()){
 
             connection.setCatalog("chess");
 
-            statement = connection.prepareStatement(tableSQL);
+            PreparedStatement statement = connection.prepareStatement(tableSQL);
             statement.execute();
 
         }
@@ -46,9 +37,5 @@ public abstract class SQLDataAccessObject {
         }
     }
 
-    protected PreparedStatement prepareSQL(String sql) throws SQLException{
-        Connection connection = getConnection();
-        return connection.prepareStatement(sql);
-    }
 
 }

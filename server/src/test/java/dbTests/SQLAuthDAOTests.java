@@ -22,8 +22,8 @@ public class SQLAuthDAOTests {
     @BeforeEach
     void initializeTests() throws DataAccessException {
 
-        DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
-        DataAccessObject<UserData> userDAO = new SQLUserDAO(url);
+        DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
+        DataAccessObject<UserData> userDAO = new SQLUserDAO();
 
         authDAO.clear();
         userDAO.clear();
@@ -43,7 +43,7 @@ public class SQLAuthDAOTests {
     void testCreateRecord(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession = authFactory.createData("TestUser");
 
@@ -63,7 +63,7 @@ public class SQLAuthDAOTests {
     void testDuplicateRecord(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession = authFactory.createData("TestUser");
 
@@ -82,7 +82,7 @@ public class SQLAuthDAOTests {
     void testClearRecords(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession1 = authFactory.createData("TestUser1");
             AuthData newSession2 = authFactory.createData("TestUser2");
@@ -107,7 +107,7 @@ public class SQLAuthDAOTests {
     void testGetAllRecords(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession1 = authFactory.createData("TestUser1");
             AuthData newSession2 = authFactory.createData("TestUser2");
@@ -131,7 +131,7 @@ public class SQLAuthDAOTests {
     void testGetAllEmpty(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             Collection<AuthData> sessions = authDAO.getAll();
 
@@ -149,7 +149,7 @@ public class SQLAuthDAOTests {
     void testDeleteRecord(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession1 = authFactory.createData("TestUser1");
 
@@ -173,7 +173,7 @@ public class SQLAuthDAOTests {
     void testDeleteNonExistent(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             assertThrows(ItemNotFoundException.class, () -> authDAO.delete("SomeNonexistentToken"), "Should throw ItemNotFoundException");
 
@@ -189,7 +189,7 @@ public class SQLAuthDAOTests {
     void testUpdateRecord(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession1 = authFactory.createData("TestUser1");
 
@@ -215,7 +215,7 @@ public class SQLAuthDAOTests {
     void testUpdateNonExistent(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData fakeSession = authFactory.createData("FakeUser");
 
@@ -233,7 +233,7 @@ public class SQLAuthDAOTests {
     void testGetSuccessfully(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData newSession = authFactory.createData("TestUser1");
             authDAO.create(newSession);
@@ -253,7 +253,7 @@ public class SQLAuthDAOTests {
     void testGetNonExistent(){
 
         try{
-            DataAccessObject<AuthData> authDAO = new SQLAuthDAO(url);
+            DataAccessObject<AuthData> authDAO = new SQLAuthDAO();
 
             AuthData session = authDAO.get("SoneNonexistentToken");
 

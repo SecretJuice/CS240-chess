@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.AuthData;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,9 +11,9 @@ import java.util.Collection;
 
 public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<AuthData> {
 
-    public SQLAuthDAO(String connectionURL) throws DataAccessException{
+    public SQLAuthDAO() throws DataAccessException{
 
-        super(connectionURL,
+        super(
                 """
                 CREATE TABLE IF NOT EXISTS auths (
                     token VARCHAR(36) NOT NULL UNIQUE,
@@ -30,7 +31,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
                 VALUES (?, ?);
                 """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, data.authToken());
             statement.setString(2, data.username());
@@ -59,7 +61,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
                 WHERE token = ?;
                 """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, key);
 
@@ -93,7 +96,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, data.username());
             statement.setString(2, data.authToken());
@@ -118,7 +122,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, key);
 
             resultCode = statement.executeUpdate();
@@ -138,7 +143,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
                 """
                 DELETE FROM auths;
                 """;
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.execute();
         }
@@ -158,7 +164,8 @@ public class SQLAuthDAO extends SQLDataAccessObject implements DataAccessObject<
                     auths;
                 """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             ResultSet results = statement.executeQuery();
 

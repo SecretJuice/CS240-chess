@@ -8,9 +8,9 @@ import java.util.Collection;
 
 public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<UserData>{
 
-    public SQLUserDAO(String connectionURL) throws DataAccessException{
+    public SQLUserDAO() throws DataAccessException{
 
-        super(connectionURL,
+        super(
                 """
                 CREATE TABLE IF NOT EXISTS users (
                     username VARCHAR(30) NOT NULL UNIQUE,
@@ -30,7 +30,8 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
             VALUES (?, ?, ?);
             """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, data.username());
             statement.setString(2, data.password());
@@ -63,7 +64,8 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
                 users.username = ?;
             """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, key);
 
@@ -98,7 +100,8 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.setString(1, data.password());
             statement.setString(2, data.email());
@@ -125,7 +128,9 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
 
         int resultCode = 0;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
+
             statement.setString(1, key);
 
             resultCode = statement.executeUpdate();
@@ -144,7 +149,8 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
                 """
                 DELETE FROM users;
                 """;
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             statement.execute();
         }
@@ -165,7 +171,8 @@ public class SQLUserDAO extends SQLDataAccessObject implements DataAccessObject<
                     users;
                 """;
 
-        try(PreparedStatement statement = prepareSQL(sql)){
+        try(Connection connection = getConnection()){
+            PreparedStatement statement = connection.prepareStatement(sql);
 
             ResultSet results = statement.executeQuery();
 
