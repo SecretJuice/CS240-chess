@@ -1,10 +1,12 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataAccess.DataAccessObject;
 import dataAccess.LocalAuthDAO;
 import dataAccess.LocalGameDAO;
 import model.AuthData;
 import model.GameData;
+import model.UserData;
 import server.GameFactoryRandomID;
 import server.requests.BadRequestException;
 import server.requests.CreateGameRequest;
@@ -17,14 +19,22 @@ import spark.Response;
 
 public class CreateGameHandler extends Handler{
 
+    private final DataAccessObject<AuthData> authDAO;
+    private final DataAccessObject<GameData> gameDAO;
+
+    public CreateGameHandler(DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO){
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
     @Override
     public Object handle(Request request, Response response) throws Exception{
 
-        AuthData authData = authenticate(request);
+        AuthData authData = authenticate(request, authDAO);
 
         CreateGameRequest createGameRequest = parseRequest(request.body());
 
-        GameCreationService service = new GameCreationService(new LocalGameDAO(), new GameFactoryRandomID());
+        GameCreationService service = new GameCreationService(gameDAO, new GameFactoryRandomID());
 
         GameData newGame = service.createGame(createGameRequest.gameName());
 

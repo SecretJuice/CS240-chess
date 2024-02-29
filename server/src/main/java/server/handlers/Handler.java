@@ -1,6 +1,7 @@
 package server.handlers;
 
 import dataAccess.DataAccessException;
+import dataAccess.DataAccessObject;
 import dataAccess.LocalAuthDAO;
 import model.AuthData;
 import server.services.AuthenticationService;
@@ -15,8 +16,8 @@ public class Handler implements Route {
         throw new Exception("Not Implemented");
     }
 
-    protected AuthData authenticate(Request req) throws Exception{
-        AuthenticationService authService = new AuthenticationService(new LocalAuthDAO());
+    protected AuthData authenticate(Request req, DataAccessObject<AuthData> authDAO) throws Exception{
+        AuthenticationService authService = new AuthenticationService(authDAO);
 
         return authService.authenticateSession(req.headers("Authorization"));
     }

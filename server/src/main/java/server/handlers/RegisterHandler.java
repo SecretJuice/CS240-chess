@@ -1,9 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataAccess.DataAccessObject;
 import dataAccess.LocalAuthDAO;
 import dataAccess.LocalUserDAO;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import server.AuthFactoryRandomToken;
 import server.requests.BadRequestException;
@@ -14,12 +16,20 @@ import spark.Response;
 
 public class RegisterHandler extends Handler{
 
+    private final DataAccessObject<UserData> userDAO;
+    private final DataAccessObject<AuthData> authDAO;
+
+    public RegisterHandler(DataAccessObject<UserData> userDAO, DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO){
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+    }
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
 
         RegisterUserRequest registerRequest = parseRequest(request.body());
 
-        UserRegistrationService service = new UserRegistrationService(new LocalUserDAO(), new LocalAuthDAO(), new AuthFactoryRandomToken());
+        UserRegistrationService service = new UserRegistrationService(userDAO, authDAO, new AuthFactoryRandomToken());
 
         UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
 

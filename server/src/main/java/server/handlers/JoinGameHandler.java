@@ -1,8 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataAccess.DataAccessObject;
 import dataAccess.LocalGameDAO;
 import model.AuthData;
+import model.GameData;
+import model.UserData;
 import server.requests.BadRequestException;
 import server.requests.CreateGameRequest;
 import server.requests.JoinGameRequest;
@@ -12,14 +15,22 @@ import spark.Response;
 
 public class JoinGameHandler extends Handler{
 
+    private final DataAccessObject<AuthData> authDAO;
+    private final DataAccessObject<GameData> gameDAO;
+
+    public JoinGameHandler(DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO){
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
 
-        AuthData session = authenticate(request);
+        AuthData session = authenticate(request, authDAO);
 
         JoinGameRequest joinGameRequest = parseRequest(request.body());
 
-        JoinGameService service = new JoinGameService(new LocalGameDAO());
+        JoinGameService service = new JoinGameService(gameDAO);
 
         service.joinGame(joinGameRequest, session);
 

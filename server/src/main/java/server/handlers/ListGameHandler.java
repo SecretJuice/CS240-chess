@@ -1,9 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataAccess.DataAccessObject;
 import dataAccess.LocalGameDAO;
 import model.AuthData;
 import model.GameData;
+import model.UserData;
 import server.responses.ListGameReponse;
 import server.services.GameBrowserService;
 import spark.Request;
@@ -13,12 +15,20 @@ import java.util.Collection;
 
 public class ListGameHandler extends Handler{
 
+    private final DataAccessObject<AuthData> authDAO;
+    private final DataAccessObject<GameData> gameDAO;
+
+    public ListGameHandler(DataAccessObject<AuthData> authDAO, DataAccessObject<GameData> gameDAO){
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
 
-        AuthData session = authenticate(request);
+        AuthData session = authenticate(request, authDAO);
 
-        GameBrowserService service = new GameBrowserService(new LocalGameDAO());
+        GameBrowserService service = new GameBrowserService(gameDAO);
 
         Collection<GameData> gameList = service.getGameList();
 
