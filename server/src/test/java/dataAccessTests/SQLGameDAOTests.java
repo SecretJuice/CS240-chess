@@ -1,4 +1,4 @@
-package dbTests;
+package dataAccessTests;
 
 import dataAccess.*;
 import model.GameData;
@@ -6,7 +6,6 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import server.AuthFactoryHashUsername;
 import server.DataFactory;
 import server.GameFactoryHashName;
 
