@@ -1,7 +1,12 @@
 package clientTests;
 
+import data.requests.UnauthorizedException;
+import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import web.ServerFacade;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class ServerFacadeTests {
@@ -11,7 +16,7 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        var port = server.run(7777);
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -22,8 +27,18 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void testLoginNonexistant() {
+
+        ServerFacade serverFacade = new ServerFacade();
+        try{
+            serverFacade.login("NonexistentUser", "BadPassword");
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        assertThrows(UnauthorizedException.class, () -> serverFacade.login("NonexistentUser", "BadPassword"));
+
     }
 
 }
