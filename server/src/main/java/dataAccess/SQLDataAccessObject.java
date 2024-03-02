@@ -26,8 +26,6 @@ public abstract class SQLDataAccessObject {
 
         try(Connection connection = getConnection()){
 
-            connection.setCatalog("chess");
-
             PreparedStatement statement = connection.prepareStatement(tableSQL);
             statement.execute();
 
