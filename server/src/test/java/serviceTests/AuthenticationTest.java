@@ -23,7 +23,7 @@ public class AuthenticationTest {
     @BeforeEach
     void setup() throws DataAccessException {
 
-        authDAO = new SQLAuthDAO();
+        authDAO = new LocalAuthDAO();
         authDAO.clear();
     }
 

@@ -91,9 +91,9 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
 
                 data = new GameData(
                         results.getInt("gameID"),
+                        results.getString("white_player"),
+                        results.getString("black_player"),
                         results.getString("gameName"),
-                        results.getString("white_username"),
-                        results.getString("black_username"),
                         game);
             }
 
@@ -207,9 +207,9 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
 
                 GameData result = new GameData(
                         results.getInt("gameID"),
+                        results.getString("white_player"),
+                        results.getString("black_player"),
                         results.getString("gameName"),
-                        results.getString("white_username"),
-                        results.getString("black_username"),
                         game);
 
                 data.add(result);

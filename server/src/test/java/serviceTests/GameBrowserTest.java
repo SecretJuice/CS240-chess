@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import dataAccess.LocalGameDAO;
+import dataAccess.SQLGameDAO;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameBrowserTest {
 
-    private DataAccessObject<GameData> gameDAO = new LocalGameDAO();
+    private DataAccessObject<GameData> gameDAO;
 
     @BeforeEach
     void setup() throws DataAccessException{
+        gameDAO = new LocalGameDAO();
         gameDAO.clear();
     }
 

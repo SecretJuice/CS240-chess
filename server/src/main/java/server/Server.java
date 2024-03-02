@@ -88,7 +88,7 @@ public class Server {
             else{
                 userDAO = new SQLUserDAO();
                 authDAO = new SQLAuthDAO();
-                gameDAO = new LocalGameDAO();
+                gameDAO = new SQLGameDAO();
             }
         }
         catch(DataAccessException e){
