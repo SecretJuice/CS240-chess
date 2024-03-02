@@ -79,7 +79,7 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, key);
+            statement.setInt(1, Integer.parseInt(key));
 
             ResultSet results = statement.executeQuery();
 
@@ -109,9 +109,12 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
 
         String sql =
                 """
-                UPDATE users SET
-                password_hash = ?, email = ?
-                WHERE username = ?;
+                UPDATE games SET
+                    name = ?,
+                    white_player = ?,
+                    black_player = ?,
+                    state = ?
+                WHERE gameID = ?;
                 """;
 
         int resultCode = 0;
@@ -119,10 +122,12 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, data.password());
-            statement.setString(2, data.email());
+            statement.setString(1, data.gameName());
+            statement.setString(2, data.whiteUsername());
+            statement.setString(3, data.blackUsername());
+            statement.setString(4, jsonParser.toJson(data.game()));
 
-            statement.setString(3, data.username());
+            statement.setInt(5, data.gameID());
 
             resultCode = statement.executeUpdate();
         }
@@ -131,7 +136,7 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         }
 
         if (resultCode == 0) {
-            throw new ItemNotFoundException("User doesn't exist");
+            throw new ItemNotFoundException("Game doesn't exist");
         }
     }
 
@@ -139,7 +144,7 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
 
         String sql =
                 """
-                DELETE FROM users WHERE username = ?;
+                DELETE FROM games WHERE gameID = ?;
                 """;
 
         int resultCode = 0;
@@ -147,7 +152,7 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setString(1, key);
+            statement.setInt(1, Integer.parseInt(key));
 
             resultCode = statement.executeUpdate();
         }
@@ -156,14 +161,14 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         }
 
         if (resultCode == 0){
-            throw new ItemNotFoundException("User doesn't exist");
+            throw new ItemNotFoundException("Game doesn't exist");
         }
     }
 
     public void clear() throws DataAccessException {
         String sql =
                 """
-                DELETE FROM users;
+                DELETE FROM games;
                 """;
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -180,11 +185,13 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
         String sql =
                 """
                 SELECT
-                    users.username      AS username,
-                    users.password_hash AS password,
-                    users.email         AS email
+                    games.gameID AS gameID,
+                    games.name AS gameName,
+                    games.white_player AS white_player,
+                    games.black_player AS black_player,
+                    games.state AS game
                 FROM
-                    users;
+                    games;
                 """;
 
         try(Connection connection = getConnection()){
@@ -196,10 +203,14 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
 
             while(results.next()) {
 
+                ChessGame game = jsonParser.fromJson(results.getString("game"), ChessGame.class);
+
                 GameData result = new GameData(
-                        results.getString("username"),
-                        results.getString("password"),
-                        results.getString("email"));
+                        results.getInt("gameID"),
+                        results.getString("gameName"),
+                        results.getString("white_username"),
+                        results.getString("black_username"),
+                        game);
 
                 data.add(result);
             }
@@ -209,6 +220,4 @@ public class SQLGameDAO extends SQLDataAccessObject implements DataAccessObject<
             throw new DataAccessException(e.getMessage());
         }
     }
-}
-    
 }
