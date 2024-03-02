@@ -1,11 +1,10 @@
 package server.services;
 
-import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import dataAccess.ItemAlreadyExistsException;
 import model.GameData;
 import server.DataFactory;
-import server.requests.BadRequestException;
+import data.requests.BadRequestException;
 
 public class GameCreationService extends Service{
 

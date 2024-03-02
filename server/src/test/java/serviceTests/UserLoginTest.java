@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.requests.UnauthorizedException;
+import data.requests.UnauthorizedException;
 import server.services.UserLoginService;
 
 import static org.junit.jupiter.api.Assertions.*;

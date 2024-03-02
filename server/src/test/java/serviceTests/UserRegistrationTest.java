@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.requests.ForbiddenException;
+import data.requests.ForbiddenException;
 import server.services.UserRegistrationService;
 
 import java.util.ArrayList;

@@ -2,11 +2,9 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.DataAccessObject;
-import dataAccess.LocalGameDAO;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
-import server.responses.ListGameReponse;
+import data.responses.ListGameReponse;
 import server.services.GameBrowserService;
 import spark.Request;
 import spark.Response;

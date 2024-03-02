@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.DataFactory;
 import server.GameFactoryHashName;
-import server.requests.BadRequestException;
+import data.requests.BadRequestException;
 import server.services.GameCreationService;
 
 import static org.junit.jupiter.api.Assertions.*;

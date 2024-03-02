@@ -1,4 +1,4 @@
-package server.requests;
+package data.requests;
 
 public class BadRequestException extends Exception{
     public BadRequestException(String message) { super(message); }

@@ -4,7 +4,7 @@ import dataAccess.DataAccessObject;
 import model.AuthData;
 import model.UserData;
 import server.DataFactory;
-import server.requests.UnauthorizedException;
+import data.requests.UnauthorizedException;
 
 import java.util.Objects;
 

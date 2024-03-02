@@ -5,12 +5,10 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import server.handlers.*;
-import server.requests.BadRequestException;
-import server.requests.ForbiddenException;
-import server.requests.UnauthorizedException;
+import data.requests.BadRequestException;
+import data.requests.ForbiddenException;
+import data.requests.UnauthorizedException;
 import spark.*;
-
-import java.nio.file.Paths;
 
 public class Server {
 

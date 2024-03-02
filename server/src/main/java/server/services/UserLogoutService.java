@@ -3,7 +3,7 @@ package server.services;
 import dataAccess.DataAccessObject;
 import dataAccess.ItemNotFoundException;
 import model.AuthData;
-import server.requests.UnauthorizedException;
+import data.requests.UnauthorizedException;
 
 public class UserLogoutService extends Service{
 
