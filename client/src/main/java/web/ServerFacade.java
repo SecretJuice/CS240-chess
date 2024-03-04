@@ -2,10 +2,12 @@ package web;
 
 import com.google.gson.Gson;
 import data.requests.*;
+import data.responses.CreateGameResponse;
 import data.responses.ErrorResponse;
 import data.responses.HTTPResponse;
 import data.responses.SessionResponse;
 import model.AuthData;
+import model.GameData;
 
 public class ServerFacade {
 
@@ -59,6 +61,19 @@ public class ServerFacade {
         }
 
         HTTPResponse response = connector.request(WebConnector.Method.DELETE, WebConnector.EndPoint.SESSION, session.authToken(), null);
+
+    }
+
+    public int createGame(String gameName) throws Exception{
+
+        CreateGameRequest gameRequest = new CreateGameRequest(gameName);
+        String requestBody = parser.toJson(gameRequest);
+
+        HTTPResponse response = connector.request(WebConnector.Method.POST, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
+
+        CreateGameResponse createGameResponse = parser.fromJson(response.body(), CreateGameResponse.class);
+
+        return createGameResponse.gameID();
 
     }
 
