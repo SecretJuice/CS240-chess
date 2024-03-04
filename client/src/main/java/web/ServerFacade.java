@@ -54,6 +54,10 @@ public class ServerFacade {
 
     public void logout() throws Exception{
 
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
         HTTPResponse response = connector.request(WebConnector.Method.DELETE, WebConnector.EndPoint.SESSION, session.authToken(), null);
 
     }

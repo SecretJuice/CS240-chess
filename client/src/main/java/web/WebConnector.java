@@ -47,8 +47,6 @@ public class WebConnector {
 
     public HTTPResponse request(Method method, EndPoint endPoint, String authToken, String body) throws Exception {
 
-
-
         HttpURLConnection http = sendRequest(method, endPoint, authToken, body);
 
 

@@ -2,13 +2,17 @@ package clientTests;
 
 import data.requests.ForbiddenException;
 import data.requests.UnauthorizedException;
-import dataAccess.DataAccessException;
-import dataAccess.DataAccessObject;
-import dataAccess.LocalUserDAO;
+import dataAccess.*;
+import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import server.AuthFactoryHashUsername;
+import server.DataFactory;
 import server.Server;
 import web.ServerFacade;
+
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
 
     private static Server server;
+
+    private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
     @BeforeAll
     public static void init() {
@@ -32,7 +38,12 @@ public class ServerFacadeTests {
     @BeforeEach
     public void beforeEach() throws DataAccessException {
         DataAccessObject<UserData> userDAO = new LocalUserDAO();
+        DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
+        DataAccessObject<GameData> gameDAO = new LocalGameDAO();
+
         userDAO.clear();
+        authDAO.clear();
+        gameDAO.clear();
     }
 
     @Test
@@ -96,5 +107,52 @@ public class ServerFacadeTests {
             fail("Should not throw exception: " + e.getMessage());
         }
     }
+
+    @Test
+    public void testLogoutSuccessful(){
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
+
+            AuthData session = authFactory.createData("TestUser");
+            authDAO.create(session);
+
+            serverFacade.setSession(session);
+            serverFacade.logout();
+
+            Collection<AuthData> sessions = authDAO.getAll();
+
+            assertTrue(sessions.isEmpty(), "Sessions should not contain auth for user");
+        }
+        catch(Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testLogoutNonexistant() {
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        AuthData session = authFactory.createData("TestUser");
+
+        serverFacade.setSession(session);
+
+        assertThrows(UnauthorizedException.class, () -> serverFacade.logout(), "Should throw UnauthorizedException");
+
+    }
+
+    @Test
+    public void testLogoutNoSession() {
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        assertThrows(UnauthorizedException.class, () -> serverFacade.logout(), "Should throw UnauthorizedException");
+
+    }
+
+
 
 }
