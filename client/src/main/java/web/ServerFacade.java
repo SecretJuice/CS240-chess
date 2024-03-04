@@ -1,10 +1,7 @@
 package web;
 
 import com.google.gson.Gson;
-import data.requests.BadRequestException;
-import data.requests.ForbiddenException;
-import data.requests.LoginRequest;
-import data.requests.UnauthorizedException;
+import data.requests.*;
 import data.responses.ErrorResponse;
 import data.responses.HTTPResponse;
 import data.responses.SessionResponse;
@@ -25,7 +22,7 @@ public class ServerFacade {
     }
 
 
-    public AuthData login(String username, String password) throws Exception{
+    public String login(String username, String password) throws Exception{
 
         LoginRequest loginRequest = new LoginRequest(username, password);
         String body = parser.toJson(loginRequest);
@@ -37,15 +34,29 @@ public class ServerFacade {
         AuthData newSession = new AuthData(sessionResponse.authToken(), sessionResponse.username());
         setSession(newSession);
 
-        return newSession;
+        return newSession.username();
     }
 
+    public String register(String username, String password, String email) throws Exception{
 
+        RegisterUserRequest registrationRequest = new RegisterUserRequest(username, password, email);
+        String body = parser.toJson(registrationRequest);
 
-    private String extractError(String body){
+        HTTPResponse response = connector.request(WebConnector.Method.POST, WebConnector.EndPoint.USER, null, body);
 
-        ErrorResponse errorData = parser.fromJson(body, ErrorResponse.class);
-        return errorData.message();
+        SessionResponse sessionResponse = parser.fromJson(response.body(), SessionResponse.class);
+
+        AuthData newSession = new AuthData(sessionResponse.authToken(), sessionResponse.username());
+        setSession(newSession);
+
+        return newSession.username();
     }
+
+    public void logout() throws Exception{
+
+        HTTPResponse response = connector.request(WebConnector.Method.DELETE, WebConnector.EndPoint.SESSION, session.authToken(), null);
+
+    }
+
 
 }

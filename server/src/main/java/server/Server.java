@@ -17,12 +17,16 @@ public class Server {
     private DataAccessObject<GameData> gameDAO;
 
     public int run(int desiredPort) {
+        return run(desiredPort, false);
+    }
+
+    public int run(int desiredPort, boolean localDataStore){
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        initializeDataAccess(false);
+        initializeDataAccess(localDataStore);
         registerEndpoints();
         mapExceptions();
 
