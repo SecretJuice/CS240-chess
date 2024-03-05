@@ -23,6 +23,10 @@ public class ServerFacadeTests {
 
     private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
 
+    private DataAccessObject<UserData> userDAO = new LocalUserDAO();
+    private DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
+    private DataAccessObject<GameData> gameDAO = new LocalGameDAO();
+
     @BeforeAll
     public static void init() {
         server = new Server();
@@ -37,10 +41,6 @@ public class ServerFacadeTests {
 
     @BeforeEach
     public void beforeEach() throws DataAccessException {
-        DataAccessObject<UserData> userDAO = new LocalUserDAO();
-        DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
-        DataAccessObject<GameData> gameDAO = new LocalGameDAO();
-
         userDAO.clear();
         authDAO.clear();
         gameDAO.clear();
@@ -53,7 +53,6 @@ public class ServerFacadeTests {
         try{
 
             UserData testUser = new UserData("TestUser", "TestPassword", null);
-            DataAccessObject<UserData> userDAO = new LocalUserDAO();
             userDAO.create(testUser);
 
             String result = serverFacade.login("TestUser", "TestPassword");
@@ -114,7 +113,6 @@ public class ServerFacadeTests {
         ServerFacade serverFacade = new ServerFacade();
 
         try{
-            DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
 
             AuthData session = authFactory.createData("TestUser");
             authDAO.create(session);
@@ -153,6 +151,34 @@ public class ServerFacadeTests {
 
     }
 
+    @Test public void testCreateGameSuccessfully(){
 
+        ServerFacade serverFacade = new ServerFacade();
 
+        try{
+            makeSession(serverFacade, "TestUser");
+
+            Integer gameID = serverFacade.createGame("TestGame");
+
+            assertNotNull(gameID, "Should return gameID");
+        }
+        catch(Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test public void testCreateGameBadSession(){
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        assertThrows(UnauthorizedException.class, () -> {
+            serverFacade.createGame("TestGame");
+        }, "Should throw UnauthorizedException");
+    }
+
+    private void makeSession(ServerFacade facade, String username) throws Exception{
+        AuthData session = authFactory.createData(username);
+        authDAO.create(session);
+        facade.setSession(session);
+    }
 }

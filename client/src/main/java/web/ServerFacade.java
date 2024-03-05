@@ -66,6 +66,10 @@ public class ServerFacade {
 
     public int createGame(String gameName) throws Exception{
 
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
         CreateGameRequest gameRequest = new CreateGameRequest(gameName);
         String requestBody = parser.toJson(gameRequest);
 
