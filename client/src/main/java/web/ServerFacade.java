@@ -1,5 +1,7 @@
 package web;
 
+import chess.ChessGame;
+import chess.ChessPiece;
 import com.google.gson.Gson;
 import data.requests.*;
 import data.responses.*;
@@ -91,6 +93,19 @@ public class ServerFacade {
         ListGameReponse listGameReponse = parser.fromJson(response.body(), ListGameReponse.class);
 
         return Arrays.asList(listGameReponse.games());
+    }
+
+    public void joinGame(Integer gameID, ChessGame.TeamColor color) throws Exception{
+
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(gameID, color);
+        String requestBody = parser.toJson(joinGameRequest);
+
+        HTTPResponse response = connector.request(WebConnector.Method.PUT, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
+
     }
 
 
