@@ -2,12 +2,12 @@ package web;
 
 import com.google.gson.Gson;
 import data.requests.*;
-import data.responses.CreateGameResponse;
-import data.responses.ErrorResponse;
-import data.responses.HTTPResponse;
-import data.responses.SessionResponse;
+import data.responses.*;
 import model.AuthData;
 import model.GameData;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -79,6 +79,18 @@ public class ServerFacade {
 
         return createGameResponse.gameID();
 
+    }
+
+    public Collection<GameData> listGames() throws Exception{
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        HTTPResponse response = connector.request(WebConnector.Method.GET, WebConnector.EndPoint.GAME, session.authToken(), null);
+
+        ListGameReponse listGameReponse = parser.fromJson(response.body(), ListGameReponse.class);
+
+        return Arrays.asList(listGameReponse.games());
     }
 
 

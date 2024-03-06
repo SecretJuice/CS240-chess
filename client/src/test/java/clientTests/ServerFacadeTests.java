@@ -9,9 +9,11 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
+import server.GameFactoryHashName;
 import server.Server;
 import web.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +24,7 @@ public class ServerFacadeTests {
     private static Server server;
 
     private DataFactory<AuthData> authFactory = new AuthFactoryHashUsername();
+    private DataFactory<GameData> gameFactory = new GameFactoryHashName();
 
     private DataAccessObject<UserData> userDAO = new LocalUserDAO();
     private DataAccessObject<AuthData> authDAO = new LocalAuthDAO();
@@ -130,7 +133,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogoutNonexistant() {
+    public void testLogoutNonexistent() {
 
         ServerFacade serverFacade = new ServerFacade();
 
@@ -138,7 +141,7 @@ public class ServerFacadeTests {
 
         serverFacade.setSession(session);
 
-        assertThrows(UnauthorizedException.class, () -> serverFacade.logout(), "Should throw UnauthorizedException");
+        assertThrows(UnauthorizedException.class, serverFacade::logout, "Should throw UnauthorizedException");
 
     }
 
@@ -147,7 +150,7 @@ public class ServerFacadeTests {
 
         ServerFacade serverFacade = new ServerFacade();
 
-        assertThrows(UnauthorizedException.class, () -> serverFacade.logout(), "Should throw UnauthorizedException");
+        assertThrows(UnauthorizedException.class, serverFacade::logout, "Should throw UnauthorizedException");
 
     }
 
@@ -176,9 +179,89 @@ public class ServerFacadeTests {
         }, "Should throw UnauthorizedException");
     }
 
+    @Test
+    public void testListGames(){
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeSession(serverFacade, "TestUser");
+
+            GameData game1 = gameFactory.createData("Game1");
+            GameData game2 = gameFactory.createData("Game2");
+
+            gameDAO.create(game1);
+            gameDAO.create(game2);
+
+            Collection<GameData> games = new ArrayList<>( serverFacade.listGames() );
+
+            boolean game1Found = false;
+            boolean game2Found = false;
+
+            for(GameData game : games){
+
+                if (game.equals(game1)){
+                    game1Found = true;
+                }
+
+                if (game.equals(game2)){
+                    game2Found = true;
+                }
+            }
+
+            assertTrue(game1Found && game2Found, "Returned list should contain both created games");
+        }
+        catch (Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testListGamesEmpty(){
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeSession(serverFacade, "TestUser");
+
+            Collection<GameData> games = new ArrayList<>( serverFacade.listGames() );
+
+            assertTrue(games.isEmpty(), "Returned list should be empty");
+        }
+        catch (Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+
+    }
+
+    @Test public void testListGamesBadSession(){
+
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeBadSession(serverFacade, "BadUser");
+
+            assertThrows(UnauthorizedException.class, serverFacade::listGames, "Should throw UnauthorizedException");
+        }
+        catch (Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+
+    }
+
+
+
     private void makeSession(ServerFacade facade, String username) throws Exception{
         AuthData session = authFactory.createData(username);
         authDAO.create(session);
         facade.setSession(session);
     }
+
+    private void makeBadSession(ServerFacade facade, String username) {
+        AuthData session = authFactory.createData(username);
+        facade.setSession(session);
+    }
+
+
 }
