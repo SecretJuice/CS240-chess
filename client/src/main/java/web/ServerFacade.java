@@ -14,8 +14,15 @@ import java.util.Collection;
 public class ServerFacade {
 
     private final Gson parser = new Gson();
-    private final WebConnector connector = new WebConnector("http://localhost:7777");
+    private WebConnector connector = null;
     private AuthData session;
+
+    public ServerFacade(){
+        connector = new WebConnector("http://localhost:7777");
+    }
+    public ServerFacade(String serverURL){
+        connector = new WebConnector(serverURL);
+    }
 
     public AuthData getSession() {
         return session;
