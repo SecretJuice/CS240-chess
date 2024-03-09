@@ -1,5 +1,7 @@
 package clientTests;
 
+import chess.ChessGame;
+import data.requests.BadRequestException;
 import data.requests.ForbiddenException;
 import data.requests.UnauthorizedException;
 import dataAccess.*;
@@ -235,7 +237,8 @@ public class ServerFacadeTests {
 
     }
 
-    @Test public void testListGamesBadSession(){
+    @Test
+    public void testListGamesBadSession(){
 
         ServerFacade serverFacade = new ServerFacade();
 
@@ -250,7 +253,55 @@ public class ServerFacadeTests {
 
     }
 
+    @Test
+    public void testJoinGameSuccessfully(){
 
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeSession(serverFacade, "TestUser");
+
+            GameData game = gameFactory.createData("Test Game");
+            gameDAO.create(game);
+
+            serverFacade.joinGame(game.gameID(), ChessGame.TeamColor.WHITE);
+        }
+        catch (Exception e){
+            fail("Should not throw exception: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testJoinGameNonexistent(){
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeSession(serverFacade, "TestUser");
+        }
+        catch(Exception e){
+            fail("Should not throw exception when initializing session");
+        }
+        assertThrows(BadRequestException.class, () -> serverFacade.joinGame(123, ChessGame.TeamColor.WHITE),
+                "Should throw BadRequestException");
+    }
+
+    @Test
+    public void testJoinGameAlreadyJoined(){
+        ServerFacade serverFacade = new ServerFacade();
+
+        try{
+            makeSession(serverFacade, "TestUser");
+
+            GameData game = new GameData(123, "UrTooSlow", null, "Test Game", new ChessGame());
+            gameDAO.create(game);
+        }
+        catch(Exception e){
+            fail("Should not throw exception when initializing test");
+        }
+        assertThrows(ForbiddenException.class, () -> serverFacade.joinGame(123, ChessGame.TeamColor.WHITE),
+                "Should throw ForbiddenException");
+    }
 
     private void makeSession(ServerFacade facade, String username) throws Exception{
         AuthData session = authFactory.createData(username);
