@@ -6,13 +6,17 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.*;
+
 public class UserInterface {
 
     private ServerFacade serverFacade = null;
 
+    private boolean isRunning = true;
+
     private Command[] loggedOutCommands = {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
-            new Command("quit", null, "Exits the program"),
+            new Command("quit", this::quitCommand, "Exits the program"),
             new Command("login", null, "Login existing account"),
             new Command("register", null, "Create new account"),
     };
@@ -29,9 +33,9 @@ public class UserInterface {
     }
 
     public void startUI(){
-        boolean running = true;
+        isRunning = true;
 
-        while (running){
+        while (isRunning){
             String[] command = promptCommand(isLoggedIn());
             processCommand(command);
         }
@@ -39,7 +43,7 @@ public class UserInterface {
 
     private String[] promptCommand(boolean loggedIn){
         String prefix = loggedIn ? "[LOGGED IN]>>> " : "[LOGGED OUT]>>> ";
-        System.out.print(prefix);
+        printNormal(prefix);
 
         Scanner scanner = new Scanner(System.in);
         String input = scanner.next();
@@ -63,10 +67,10 @@ public class UserInterface {
             }
 
             if(selectedCommand == null){
-                System.err.println("Unknown command ["+ commandName +"]");
+                printError("Unknown command ["+ commandName +"]\n");
             }
             else if(selectedCommand.function() == null){
-                throw new RuntimeException("Command not implemented: " + selectedCommand.name());
+                throw new RuntimeException("Command not implemented: " + selectedCommand.name() + "\n");
             }
             else {
                 selectedCommand.function().run();
@@ -75,7 +79,7 @@ public class UserInterface {
         }
         else {
 
-            System.err.println("Too many arguments");
+            printError("Too many arguments\n");
         }
     }
 
@@ -84,8 +88,18 @@ public class UserInterface {
         Command[] commands = isLoggedIn() ? loggedInCommands : loggedOutCommands;
 
         for(Command command : commands){
-            System.out.println("  " + command.name() + "  |  " + command.description());
+            printNormal("  " + command.name() + "  |  " + command.description() + "\n");
         }
+
+    }
+
+    private void quitCommand(){
+
+        Command[] commands = isLoggedIn() ? loggedInCommands : loggedOutCommands;
+
+        printNormal("Quiting... thanks for playing!\n");
+
+        isRunning = false;
 
     }
 
@@ -95,11 +109,25 @@ public class UserInterface {
 
             return serverFacade.getSession() != null;
         }
-
         return false;
-
     }
 
+    /*
+    Takes in base text and augments it with a given set of PREFIX escape sequences,
+    then sends it to System.out.print() *MAKE SURE TO INCLUDE \n*
+    Will reset everything at the end of the string.
+     */
+    private void printDecorateString(String text, String decorators, String resets){
+        String output = decorators + text + resets;
+        System.out.print(output);
+    }
 
+    private void printNormal(String text){
+        printDecorateString(text, SET_TEXT_COLOR_WHITE, RESET_TEXT_COLOR);
+    }
+
+    private void printError(String text){
+        printDecorateString(text, SET_TEXT_COLOR_RED, RESET_TEXT_COLOR);
+    }
 
 }
