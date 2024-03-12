@@ -48,6 +48,9 @@ public class ServerFacade {
         return newSession.username();
     }
 
+    /*
+    return String username
+     */
     public String register(String username, String password, String email) throws Exception{
 
         RegisterUserRequest registrationRequest = new RegisterUserRequest(username, password, email);
@@ -70,6 +73,8 @@ public class ServerFacade {
         }
 
         HTTPResponse response = connector.request(WebConnector.Method.DELETE, WebConnector.EndPoint.SESSION, session.authToken(), null);
+
+        setSession(null);
 
     }
 

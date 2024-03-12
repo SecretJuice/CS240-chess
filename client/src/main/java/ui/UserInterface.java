@@ -1,10 +1,12 @@
 package ui;
 
+import data.requests.BadRequestException;
+import data.requests.ForbiddenException;
+import data.requests.UnauthorizedException;
 import web.ServerFacade;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static ui.EscapeSequences.*;
 
@@ -18,14 +20,14 @@ public class UserInterface {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
             new Command("quit", this::quitCommand, "Exits the program"),
             new Command("login", null, "Login existing account"),
-            new Command("register", null, "Create new account"),
+            new Command("register", this::registerCommand, "Create new account"),
     };
 
     private Command[] loggedInCommands = {
-            new Command("help", null, "Provides help for using available commands"),
-            new Command("quit", null, "Exits the program"),
-            new Command("login", null, "Login existing account"),
-            new Command("register", null, "Create new account"),
+            new Command("help", this::helpCommand, "Provides help for using available commands"),
+            new Command("quit", this::quitCommand, "Exits the program"),
+            new Command("logout", this::logoutCommand, "End current session"),
+            new Command("listgames", null, "List all games to join"),
     };
 
     public UserInterface(ServerFacade serverFacade){
@@ -43,12 +45,32 @@ public class UserInterface {
 
     private String[] promptCommand(boolean loggedIn){
         String prefix = loggedIn ? "[LOGGED IN]>>> " : "[LOGGED OUT]>>> ";
-        printNormal(prefix);
+
+        return prompt(prefix, this::printNormal).split(" ");
+    }
+
+    private String prompt(String prefix, Consumer<String> printFunction){
+        printFunction.accept(prefix);
 
         Scanner scanner = new Scanner(System.in);
-        String input = scanner.next();
 
-        return input.split(" ");
+        return scanner.next();
+    }
+
+    /*
+    Takes in Map of parameter names and display values.
+    Returns a Map of parameter names and user input
+     */
+    private Map<String, String> promptParameters(HashMap<String, String> params){
+
+        HashMap<String, String> parameterPairs = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : params.entrySet()){
+            parameterPairs.put(entry.getKey(), prompt(entry.getValue() + " : ", this::printNormal));
+        }
+
+        return parameterPairs;
+
     }
 
     private void processCommand(String[] args){
@@ -83,6 +105,8 @@ public class UserInterface {
         }
     }
 
+
+
     private void helpCommand(){
 
         Command[] commands = isLoggedIn() ? loggedInCommands : loggedOutCommands;
@@ -95,11 +119,47 @@ public class UserInterface {
 
     private void quitCommand(){
 
-        Command[] commands = isLoggedIn() ? loggedInCommands : loggedOutCommands;
-
         printNormal("Quiting... thanks for playing!\n");
 
         isRunning = false;
+
+    }
+
+    private void registerCommand(){
+
+        HashMap<String, String> registerParams = new HashMap<>();
+        registerParams.put("username", "Username");
+        registerParams.put("password", "Password");
+        registerParams.put("email", "Email (Optional)");
+
+        Map<String, String> userInputs = promptParameters(registerParams);
+
+        try{
+            String username = serverFacade.register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
+            printNormal("Welcome, " + username + "!\n");
+        }
+        catch(ForbiddenException e){
+            printError("Registration Failed: Username already taken.\n");
+        }
+        catch(BadRequestException e){
+            printError("Registration Failed: Required field (Username, Password) is missing.\n");
+        }
+        catch(Exception e){
+            printError("Registration Failed: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void logoutCommand(){
+
+        try{
+            serverFacade.logout();
+        }
+        catch (UnauthorizedException e){
+            printError("Already logged out. (How did you get here?)");
+        }
+        catch (Exception e){
+            printError("Could not logout: " + e.getMessage());
+        }
 
     }
 
