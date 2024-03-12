@@ -19,7 +19,7 @@ public class UserInterface {
     private Command[] loggedOutCommands = {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
             new Command("quit", this::quitCommand, "Exits the program"),
-            new Command("login", null, "Login existing account"),
+            new Command("login", this::loginCommand, "Login existing account"),
             new Command("register", this::registerCommand, "Create new account"),
     };
 
@@ -106,7 +106,6 @@ public class UserInterface {
     }
 
 
-
     private void helpCommand(){
 
         Command[] commands = isLoggedIn() ? loggedInCommands : loggedOutCommands;
@@ -146,6 +145,26 @@ public class UserInterface {
         }
         catch(Exception e){
             printError("Registration Failed: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void loginCommand(){
+
+        HashMap<String, String> loginParams = new HashMap<>();
+        loginParams.put("username", "Username");
+        loginParams.put("password", "Password");
+
+        Map<String, String> userInputs = promptParameters(loginParams);
+
+        try{
+            String username = serverFacade.login(userInputs.get("username"), userInputs.get("password"));
+            printNormal("Welcome, " + username + "!\n");
+        }
+        catch(UnauthorizedException e){
+            printError("Login Failed: Username or password was incorrect.\n");
+        }
+        catch(Exception e){
+            printError("Login Failed: " + e.getMessage() + "\n");
         }
     }
 
