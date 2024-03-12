@@ -1,8 +1,8 @@
 package ui;
 
+import chess.ChessGame;
 import data.requests.BadRequestException;
-import data.requests.ForbiddenException;
-import data.requests.UnauthorizedException;
+import model.GameData;
 import web.ServerFacade;
 
 import java.util.*;
@@ -27,7 +27,10 @@ public class UserInterface {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
             new Command("quit", this::quitCommand, "Exits the program"),
             new Command("logout", this::logoutCommand, "End current session"),
-            new Command("listgames", null, "List all games to join"),
+            new Command("listgames", this::listGamesCommand, "Browse all games to join"),
+            new Command("creategame", null, "Create a new game"),
+            new Command("join", this::joinGameCommand, "Join listed games"),
+            new Command("spectate", null, "Spectate a game in progress"),
     };
 
     public UserInterface(ServerFacade serverFacade){
@@ -137,12 +140,6 @@ public class UserInterface {
             String username = serverFacade.register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
             printNormal("Welcome, " + username + "!\n");
         }
-        catch(ForbiddenException e){
-            printError("Registration Failed: Username already taken.\n");
-        }
-        catch(BadRequestException e){
-            printError("Registration Failed: Required field (Username, Password) is missing.\n");
-        }
         catch(Exception e){
             printError("Registration Failed: " + e.getMessage() + "\n");
         }
@@ -160,9 +157,6 @@ public class UserInterface {
             String username = serverFacade.login(userInputs.get("username"), userInputs.get("password"));
             printNormal("Welcome, " + username + "!\n");
         }
-        catch(UnauthorizedException e){
-            printError("Login Failed: Username or password was incorrect.\n");
-        }
         catch(Exception e){
             printError("Login Failed: " + e.getMessage() + "\n");
         }
@@ -173,13 +167,61 @@ public class UserInterface {
         try{
             serverFacade.logout();
         }
-        catch (UnauthorizedException e){
-            printError("Already logged out. (How did you get here?)");
-        }
         catch (Exception e){
-            printError("Could not logout: " + e.getMessage());
+            printError("Could not logout: " + e.getMessage() + "\n");
         }
 
+    }
+
+    private void listGamesCommand(){
+
+        try{
+            Collection<GameData> games = serverFacade.listGames();
+            for(GameData game : games){
+
+                printNormal(game.toString() + "\n");
+
+            }
+
+            if (games.isEmpty()){
+                printNormal("There are currently no games. Use 'creategame' to start one!\n");
+            }
+        }
+        catch(Exception e){
+            printError("Could not get games: " + "\n");
+        }
+
+    }
+
+    private void joinGameCommand(){
+        HashMap<String, String> joinGameParams = new HashMap<>();
+        joinGameParams.put("gameID", "Game ID (Enter a number)");
+        joinGameParams.put("teamcolor", "Color (type WHITE or BLACK)");
+
+        Map<String, String> userInputs = promptParameters(joinGameParams);
+
+        try{
+
+            Integer gameID = Integer.parseInt(userInputs.get("gameID"));
+            ChessGame.TeamColor color = null;
+
+            if(userInputs.get("teamcolor").toUpperCase().equals("WHITE")){
+                color = ChessGame.TeamColor.WHITE;
+            }
+            else if (userInputs.get("teamcolor").toUpperCase().equals("BLACK")){
+                color = ChessGame.TeamColor.BLACK;
+            }
+            else{
+                throw new BadRequestException("Please enter a valid color (WHITE or BLACK)");
+            }
+
+            serverFacade.joinGame(gameID, color);
+
+            printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
+        }
+        catch(Exception e){
+            printError("Could not join game: " + e.getMessage() + "\n");
+        }
     }
 
     private boolean isLoggedIn(){
