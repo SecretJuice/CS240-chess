@@ -1,4 +1,5 @@
 import chess.*;
+import ui.Client;
 import ui.UserInterface;
 import web.ServerFacade;
 
@@ -12,8 +13,8 @@ public class Main {
         }
 
         ServerFacade serverFacade = new ServerFacade(serverUrl);
-        UserInterface ui = new UserInterface(serverFacade);
+        Client client = new Client(serverFacade);
 
-        ui.startUI();
+        client.UI().startUI();
     }
 }
