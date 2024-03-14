@@ -11,23 +11,37 @@ public class BoardPainter {
 
     public void paintBoard(ChessBoard board, ChessGame.TeamColor color){
 
-        testPrint(board.toString());
-
         StringBuilder boardString = new StringBuilder();
 
-        for(int row = 1; row <= 8; row ++){
-            for(int col = 1; col <= 8; col ++){
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
+        if(color == ChessGame.TeamColor.BLACK){
+            for(int row = 1; row <= 8; row ++){
+                for(int col = 8; col >= 1; col --){
+                    ChessPosition pos = new ChessPosition(row, col);
+                    ChessPiece piece = board.getPiece(pos);
 
-                String cellString = constructCell(pos, piece);
+                    String cellString = constructCell(pos, piece);
 
-                boardString.append(cellString);
+                    boardString.append(cellString);
+                }
+                boardString.append("\n");
             }
-            boardString.append("\n");
+        }
+        else{
+            for(int row = 8; row >= 1; row --){
+                for(int col = 1; col <= 8; col ++){
+                    ChessPosition pos = new ChessPosition(row, col);
+                    ChessPiece piece = board.getPiece(pos);
+
+                    String cellString = constructCell(pos, piece);
+
+                    boardString.append(cellString);
+                }
+                boardString.append("\n");
+            }
         }
 
         System.out.print(boardString.toString());
+
 
     }
 
@@ -37,12 +51,12 @@ public class BoardPainter {
 
         String pieceString = EMPTY;
 
-        String cellColorString = SET_BG_COLOR_LIGHT_GREY;
+        String cellColorString = SET_BG_COLOR_DARK_GREY;
         if(position.getRow() % 2 == 0 && position.getColumn() % 2 != 0){
-            cellColorString = SET_BG_COLOR_DARK_GREY;
+            cellColorString = SET_BG_COLOR_LIGHT_GREY;
         }
         if(position.getRow() % 2 != 0 && position.getColumn() % 2 == 0){
-            cellColorString = SET_BG_COLOR_DARK_GREY;
+            cellColorString = SET_BG_COLOR_LIGHT_GREY;
         }
 
         if(piece == null){
@@ -69,10 +83,6 @@ public class BoardPainter {
 
         return cellColorString + pieceColorString + pieceString + resetString;
 
-    }
-
-    private void testPrint(String s){
-        System.out.print(SET_TEXT_COLOR_RED + s + RESET_TEXT_COLOR);
     }
 
 }

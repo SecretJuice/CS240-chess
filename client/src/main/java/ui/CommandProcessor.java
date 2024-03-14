@@ -1,7 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
+import chess.*;
 import data.requests.BadRequestException;
 import model.GameData;
 
@@ -219,14 +218,27 @@ public class CommandProcessor {
         }
     }
 
-    private void paintboardCommand(){
+    private void paintboardCommand() {
 
         BoardPainter painter = new BoardPainter();
 
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
+        try{
+            ChessGame game = new ChessGame();
+            game.getBoard().resetBoard();
+            game.setTeamTurn(ChessGame.TeamColor.WHITE);
+            game.makeMove(new ChessMove(new ChessPosition(2, 4), new ChessPosition(4, 4), null));
 
-        painter.paintBoard(board, ChessGame.TeamColor.WHITE);
+            ChessBoard board = game.getBoard();
+
+            painter.paintBoard(board, ChessGame.TeamColor.BLACK);
+
+            client.UI().printNormal("\n");
+
+            painter.paintBoard(board, ChessGame.TeamColor.WHITE);
+        }
+        catch(Exception e){
+            client.UI().printError(e.getMessage() + "\n");
+        }
 
     }
 
