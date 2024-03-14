@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import data.requests.BadRequestException;
 import model.GameData;
@@ -18,6 +19,7 @@ public class CommandProcessor {
             new Command("quit", this::quitCommand, "Exits the program"),
             new Command("login", this::loginCommand, "Login existing account"),
             new Command("register", this::registerCommand, "Create new account"),
+            new Command("paintboard", this::paintboardCommand, "[TEST] displays default chess board."),
     };
 
     private Command[] loggedInCommands = {
@@ -215,6 +217,17 @@ public class CommandProcessor {
         catch(Exception e){
             client.UI().printError("Could not create game: " + e.getMessage() + "\n");
         }
+    }
+
+    private void paintboardCommand(){
+
+        BoardPainter painter = new BoardPainter();
+
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+
+        painter.paintBoard(board, ChessGame.TeamColor.WHITE);
+
     }
 
 }
