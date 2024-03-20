@@ -168,6 +168,8 @@ public class CommandProcessor {
 
         Map<String, String> userInputs = client.UI().promptParameters(joinGameParams);
 
+        BoardPainter painter = new BoardPainter();
+
         try{
 
             Integer gameID = Integer.parseInt(userInputs.get("gameID"));
@@ -188,6 +190,9 @@ public class CommandProcessor {
             client.Server().joinGame(desiredGame.gameID(), color);
 
             client.UI().printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
+
+            paintBoards();
+
         }
         catch(Exception e){
             client.UI().printError("Could not join game: " + e.getMessage() + "\n");
@@ -208,6 +213,8 @@ public class CommandProcessor {
             client.Server().joinGame(desiredGame.gameID(), null);
 
             client.UI().printNormal("Now spectating the game... ID[" + gameID + "]\n");
+
+            paintBoards();
         }
         catch(Exception e){
             client.UI().printError("Could not spectate game: " + e.getMessage() + "\n");
@@ -234,13 +241,16 @@ public class CommandProcessor {
 
     private void paintboardCommand() {
 
+        paintBoards();
+
+    }
+
+    private void paintBoards(){
         BoardPainter painter = new BoardPainter();
 
         try{
             ChessGame game = new ChessGame();
             game.getBoard().resetBoard();
-            game.setTeamTurn(ChessGame.TeamColor.WHITE);
-            game.makeMove(new ChessMove(new ChessPosition(2, 4), new ChessPosition(4, 4), null));
 
             ChessBoard board = game.getBoard();
 
@@ -253,7 +263,6 @@ public class CommandProcessor {
         catch(Exception e){
             client.UI().printError(e.getMessage() + "\n");
         }
-
     }
 
 }
