@@ -1,6 +1,10 @@
 package ui;
 
+import model.GameData;
 import web.ServerFacade;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Client {
 
@@ -26,6 +30,12 @@ public class Client {
 
     public CommandProcessor Commands(){
         return commandProcessor;
+    }
+
+    private final HashMap<Integer, GameData> savedGameMap = new HashMap<>();
+
+    public HashMap<Integer, GameData> SavedGames(){
+        return savedGameMap;
     }
 
     public Client(ServerFacade serverFacade){

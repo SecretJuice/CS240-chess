@@ -135,9 +135,19 @@ public class CommandProcessor {
 
         try{
             Collection<GameData> games = client.Server().listGames();
+
+            client.SavedGames().clear();
+
+            int index = 1;
             for(GameData game : games){
 
-                client.UI().printNormal(game.toString() + "\n");
+                String listing = "ID[ " + index + " ] " + game.gameName() + ": WHITE= " + game.whiteUsername() + ": BLACK= " + game.blackUsername();
+
+                client.SavedGames().put(index, game);
+
+                client.UI().printNormal(listing + "\n");
+
+                index += 1;
 
             }
 
@@ -153,7 +163,7 @@ public class CommandProcessor {
 
     private void joinGameCommand(){
         HashMap<String, String> joinGameParams = new HashMap<>();
-        joinGameParams.put("gameID", "Game ID (Enter a number)");
+        joinGameParams.put("gameID", "Game ID (Enter a number. i.e ID [ 1 ] would be 1)");
         joinGameParams.put("teamcolor", "Color (type WHITE or BLACK)");
 
         Map<String, String> userInputs = client.UI().promptParameters(joinGameParams);
@@ -173,7 +183,9 @@ public class CommandProcessor {
                 throw new BadRequestException("Please enter a valid color (WHITE or BLACK)");
             }
 
-            client.Server().joinGame(gameID, color);
+            GameData desiredGame = client.SavedGames().get(gameID);
+
+            client.Server().joinGame(desiredGame.gameID(), color);
 
             client.UI().printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
         }
@@ -191,7 +203,9 @@ public class CommandProcessor {
         Integer gameID = Integer.parseInt(userInputs.get("gameID"));
 
         try{
-            client.Server().joinGame(gameID, null);
+            GameData desiredGame = client.SavedGames().get(gameID);
+
+            client.Server().joinGame(desiredGame.gameID(), null);
 
             client.UI().printNormal("Now spectating the game... ID[" + gameID + "]\n");
         }
@@ -209,9 +223,9 @@ public class CommandProcessor {
         String gameName = userInputs.get("gameName");
 
         try{
-            int gameID = client.Server().createGame(gameName);
+            client.Server().createGame(gameName);
 
-            client.UI().printNormal("Created Game! ID[" + gameID +"]\n");
+            client.UI().printNormal("Created Game!\n");
         }
         catch(Exception e){
             client.UI().printError("Could not create game: " + e.getMessage() + "\n");

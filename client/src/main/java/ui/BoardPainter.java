@@ -14,7 +14,13 @@ public class BoardPainter {
         StringBuilder boardString = new StringBuilder();
 
         if(color == ChessGame.TeamColor.BLACK){
+
+            boardString.append(SET_TEXT_COLOR_LIGHT_GREY + "    h  g  f  e  d  c  b  a    " + RESET_TEXT_COLOR + "\n");
+
             for(int row = 1; row <= 8; row ++){
+
+                boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
+
                 for(int col = 8; col >= 1; col --){
                     ChessPosition pos = new ChessPosition(row, col);
                     ChessPiece piece = board.getPiece(pos);
@@ -23,11 +29,19 @@ public class BoardPainter {
 
                     boardString.append(cellString);
                 }
+                boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
                 boardString.append("\n");
             }
+            boardString.append(SET_TEXT_COLOR_LIGHT_GREY + "    h  g  f  e  d  c  b  a    " + RESET_TEXT_COLOR + "\n");
         }
         else{
+
+            boardString.append(SET_TEXT_COLOR_LIGHT_GREY + "    a  b  c  d  e  f  g  h    " + RESET_TEXT_COLOR + "\n");
+
             for(int row = 8; row >= 1; row --){
+
+                boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
+
                 for(int col = 1; col <= 8; col ++){
                     ChessPosition pos = new ChessPosition(row, col);
                     ChessPiece piece = board.getPiece(pos);
@@ -36,8 +50,11 @@ public class BoardPainter {
 
                     boardString.append(cellString);
                 }
+                boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
                 boardString.append("\n");
             }
+
+            boardString.append(SET_TEXT_COLOR_LIGHT_GREY + "    a  b  c  d  e  f  g  h    " + RESET_TEXT_COLOR + "\n");
         }
 
         System.out.print(boardString.toString());
