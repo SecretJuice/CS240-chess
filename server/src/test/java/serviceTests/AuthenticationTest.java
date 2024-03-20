@@ -3,14 +3,13 @@ package serviceTests;
 import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import dataAccess.LocalAuthDAO;
-import dataAccess.SQLAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.requests.UnauthorizedException;
+import data.requests.UnauthorizedException;
 import server.services.AuthenticationService;
 
 import static org.junit.jupiter.api.Assertions.*;

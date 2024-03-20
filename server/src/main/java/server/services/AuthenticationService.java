@@ -1,9 +1,8 @@
 package server.services;
 
-import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import model.AuthData;
-import server.requests.UnauthorizedException;
+import data.requests.UnauthorizedException;
 
 public class AuthenticationService extends Service{
 

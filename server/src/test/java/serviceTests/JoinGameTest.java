@@ -11,10 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.AuthFactoryHashUsername;
 import server.DataFactory;
-import server.requests.BadRequestException;
-import server.requests.ForbiddenException;
-import server.requests.JoinGameRequest;
-import server.requests.UnauthorizedException;
+import data.requests.BadRequestException;
+import data.requests.ForbiddenException;
+import data.requests.JoinGameRequest;
+import data.requests.UnauthorizedException;
 import server.services.JoinGameService;
 
 import static org.junit.jupiter.api.Assertions.*;

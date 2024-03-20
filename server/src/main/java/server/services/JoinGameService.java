@@ -3,10 +3,10 @@ package server.services;
 import dataAccess.DataAccessObject;
 import model.AuthData;
 import model.GameData;
-import server.requests.BadRequestException;
-import server.requests.ForbiddenException;
-import server.requests.JoinGameRequest;
-import server.requests.UnauthorizedException;
+import data.requests.BadRequestException;
+import data.requests.ForbiddenException;
+import data.requests.JoinGameRequest;
+import data.requests.UnauthorizedException;
 
 import java.util.Objects;
 

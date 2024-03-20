@@ -1,12 +1,11 @@
 package server.services;
 
-import dataAccess.DataAccessException;
 import dataAccess.DataAccessObject;
 import dataAccess.ItemAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
 import server.DataFactory;
-import server.requests.ForbiddenException;
+import data.requests.ForbiddenException;
 
 public class UserRegistrationService extends Service{
 

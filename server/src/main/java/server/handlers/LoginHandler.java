@@ -2,15 +2,12 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.DataAccessObject;
-import dataAccess.LocalAuthDAO;
-import dataAccess.LocalUserDAO;
 import model.AuthData;
-import model.GameData;
 import model.UserData;
 import server.AuthFactoryRandomToken;
-import server.requests.BadRequestException;
-import server.requests.LoginRequest;
-import server.responses.SessionResponse;
+import data.requests.BadRequestException;
+import data.requests.LoginRequest;
+import data.responses.SessionResponse;
 import server.services.UserLoginService;
 import spark.Request;
 import spark.Response;
