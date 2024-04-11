@@ -160,12 +160,17 @@ public class WebSocketHandler {
         if (gameData == null){
             throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
         }
+        if (getPlayerTeam(connection.auth.username(), gameData) == null){
+            throw new ForbiddenException("User is not playing in this game.");
+        }
+        if (gameData.game().isGameOver()){
+            throw new Exception("Game is already over.");
+        }
 
-        ChessGame game = gameData.game();
-        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+        gameData.game().setGameOver(true);
+        gameDAO.update(gameData);
 
-        connection.send(new Gson().toJson(loadGameMessage));
-        connectionManager.broadcast(connection.auth.authToken(), connection.auth.username() + " is now spectating");
+        connectionManager.broadcast(null, connection.auth.username() + " has resigned the game");
     }
 
 }
