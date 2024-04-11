@@ -3,11 +3,13 @@ package server.websocket;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.DataAccessObject;
+import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.services.AuthenticationService;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.userCommands.*;
 
 @WebSocket
@@ -15,6 +17,7 @@ public class WebSocketHandler {
 
     private AuthenticationService authService;
     private DataAccessObject<GameData> gameDAO;
+    private WebSocketConnectionManager connectionManager = new WebSocketConnectionManager();
 
     public WebSocketHandler(AuthenticationService authService, DataAccessObject<GameData> gameDAO){
         this.authService = authService;
@@ -25,10 +28,11 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws Exception{
         UserGameCommand command = parseMessage((message));
 
-        authService.authenticateSession(command.getAuthString());
+        AuthData auth = authService.authenticateSession(command.getAuthString());
+
 
         switch (command.getCommandType()){
-            case JOIN_PLAYER -> joinPlayer((JoinPlayerCommand) command);
+            case JOIN_PLAYER -> joinPlayer((JoinPlayerCommand) command, auth, session);
             case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command);
             case LEAVE -> leave((LeaveCommand) command);
             case MAKE_MOVE -> makeMove((MakeMoveCommand) command);
@@ -49,10 +53,17 @@ public class WebSocketHandler {
         };
     }
 
-    private void joinPlayer(JoinPlayerCommand command) throws Exception{
+    private void joinPlayer(JoinPlayerCommand command, AuthData authData, Session session) throws Exception{
+        WebSocketConnection connection = connectionManager.add(authData, session);
+
         GameData gameData = gameDAO.get(Integer.toString(command.getGameID()));
 
         ChessGame game = gameData.game();
+
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+
+        connection.send(new Gson().toJson(loadGameMessage));
+        connectionManager.broadcast(connection.auth.authToken(), authData.username() + " has joined team " + command.getPlayerColor().toString());
     }
 
     private void joinObserver(JoinObserverCommand command) throws Exception{

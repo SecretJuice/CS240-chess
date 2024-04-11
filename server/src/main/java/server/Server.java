@@ -40,7 +40,7 @@ public class Server {
      * Initializes all the servers endpoints
      */
     private void registerEndpoints(){
-        Spark.webSocket("/connect", new WebSocketHandler(new AuthenticationService(authDAO)));
+        Spark.webSocket("/connect", new WebSocketHandler(new AuthenticationService(authDAO), gameDAO));
         Spark.delete("/db", (req, res) -> new ClearAppHandler(userDAO, authDAO, gameDAO).handle(req, res)); //Clear Application
         Spark.post("/user", (req, res) -> new RegisterHandler(userDAO, authDAO).handle(req, res)); //Register User
         Spark.post("/session", (req, res) -> new LoginHandler(userDAO, authDAO).handle(req, res)); //Login
