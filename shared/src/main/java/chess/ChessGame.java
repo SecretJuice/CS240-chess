@@ -15,6 +15,16 @@ public class ChessGame {
     private ChessBoard chessBoard;
     private TeamColor currentTeamTurn;
 
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
+    }
+
+    private boolean isGameOver = false;
+
     public ChessGame() {
         chessBoard = new ChessBoard();
     }
@@ -72,6 +82,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (isGameOver()){
+            throw new InvalidMoveException("The game is over!");
+        }
+
         ChessPiece movingPiece = getBoard().getPiece(move.getStartPosition());
 
         if (movingPiece == null){
@@ -219,6 +233,8 @@ public class ChessGame {
 
         teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
 
+        setGameOver(true);
+
         return teamMoves.isEmpty();
         // get if in check
         // iterate over all legal moves: if after any of them I am out of check
@@ -260,6 +276,8 @@ public class ChessGame {
         Collection<ChessMove> teamMoves = getTeamValidMoves(getBoard(), teamColor);
 
         teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
+
+        setGameOver(true);
 
         return teamMoves.isEmpty();
 

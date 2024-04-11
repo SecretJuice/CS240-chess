@@ -47,7 +47,7 @@ public class WebSocketHandler {
                 case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, connection);
                 case LEAVE -> leave((LeaveCommand) command);
                 case MAKE_MOVE -> makeMove((MakeMoveCommand) command, connection);
-                case RESIGN -> resign((ResignCommand) command);
+                case RESIGN -> resign((ResignCommand) command, connection);
             }
         }
         catch(Exception e){
@@ -78,8 +78,7 @@ public class WebSocketHandler {
             throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
         }
 
-        if (command.getPlayerColor() == ChessGame.TeamColor.WHITE && !Objects.equals(gameData.whiteUsername(), connection.auth.username()) ||
-           (command.getPlayerColor() == ChessGame.TeamColor.BLACK && !Objects.equals(gameData.blackUsername(), connection.auth.username()))){
+        if (getPlayerTeam(connection.auth.username(), gameData) != command.getPlayerColor()){
 
             throw new ForbiddenException("User not joined under specified color " + command.getPlayerColor());
         }
@@ -129,7 +128,13 @@ public class WebSocketHandler {
             throw new Exception("Playing out of turn.");
         }
 
-        game.makeMove(command.getMove());
+        if (game.isGameOver()){
+            throw new Exception("Game is already finished.");
+        }
+
+        gameData.game().makeMove(command.getMove());
+
+        gameDAO.update(gameData);
 
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
         connectionManager.syncGame(loadGameMessage);
@@ -141,15 +146,26 @@ public class WebSocketHandler {
         if (Objects.equals(username, gameData.whiteUsername())){
             return ChessGame.TeamColor.WHITE;
         }
-        if (Objects.equals(username, gameData.blackUsername())){
+        else if (Objects.equals(username, gameData.blackUsername())){
             return ChessGame.TeamColor.BLACK;
         }
-
-        return null;
+        else {
+            return null;
+        }
     }
 
-    private void resign(ResignCommand command) throws Exception{
-        throw new RuntimeException("RESIGN Not implemented");
+    private void resign(ResignCommand command, WebSocketConnection connection) throws Exception{
+        GameData gameData = gameDAO.get(Integer.toString(command.getGameID()));
+
+        if (gameData == null){
+            throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
+        }
+
+        ChessGame game = gameData.game();
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+
+        connection.send(new Gson().toJson(loadGameMessage));
+        connectionManager.broadcast(connection.auth.authToken(), connection.auth.username() + " is now spectating");
     }
 
 }
