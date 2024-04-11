@@ -1,7 +1,5 @@
 package websockets;
 
-import chess.ChessBoard;
-import chess.ChessGame;
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
@@ -25,19 +23,25 @@ public class WebSocketConnector extends Endpoint {
     private void createConnection(String url) throws WebSocketException{
         try{
             url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/connect");
+            URI socketURI = new URI(url + "connect");
+
+            System.out.println(socketURI);
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                messageHandler.notify(serverMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+
+                @Override
+                public void onMessage(String message){
+
+                    messageHandler.receiveMessage(message);
+                }
 
             });
         }
         catch(DeploymentException | IOException | URISyntaxException e) {
-            throw new WebSocketException(500, e.getMessage());
+            throw new WebSocketException(500, "WebSocketException: " + e.getMessage());
         }
     }
 

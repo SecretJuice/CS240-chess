@@ -1,15 +1,14 @@
 package server.websocket;
 
 import chess.ChessGame;
-import chess.ChessMove;
 import com.google.gson.Gson;
 import data.requests.BadRequestException;
 import data.requests.ForbiddenException;
-import data.requests.UnauthorizedException;
 import dataAccess.DataAccessObject;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.services.AuthenticationService;
@@ -31,11 +30,17 @@ public class WebSocketHandler {
         this.gameDAO = gameDAO;
     }
 
+    @OnWebSocketError
+    public void onError(Throwable throwable){}
+
+//    @OnWebSocket
+//    public void onError(){}
+
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception{
         UserGameCommand command = parseMessage((message));
 
-
+        System.out.println("RECEIVED CLIENT MESSAGE: " + message);
 
         try{
             AuthData auth = authService.authenticateSession(command.getAuthString());
@@ -53,7 +58,6 @@ public class WebSocketHandler {
             System.out.println(errorMessage.getMessage());
             session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
-
     }
 
     private UserGameCommand parseMessage(String message) throws Exception{
@@ -86,6 +90,8 @@ public class WebSocketHandler {
 
         connection.send(new Gson().toJson(loadGameMessage));
         connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(), connection.auth.username() + " has joined team " + command.getPlayerColor().toString());
+
+        System.out.println("REPLYING");
     }
 
     private void joinObserver(JoinObserverCommand command, WebSocketConnection connection) throws Exception{

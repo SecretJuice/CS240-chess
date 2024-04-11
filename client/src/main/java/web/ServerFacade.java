@@ -7,6 +7,7 @@ import data.requests.*;
 import data.responses.*;
 import model.AuthData;
 import model.GameData;
+import ui.GameplayUI;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import websockets.ServerMessageHandler;
 import websockets.WebSocketConnector;
@@ -21,11 +22,10 @@ public class ServerFacade {
     private WebConnector connector = null;
     private WebSocketConnector webSocketConnector;
     private AuthData session;
+    private ServerMessageHandler gameplayUI = new GameplayUI();
 
     public ServerFacade(){
         connector = new WebConnector("http://localhost:7777");
-
-
     }
     public ServerFacade(String serverURL){
         connector = new WebConnector(serverURL);
@@ -125,25 +125,32 @@ public class ServerFacade {
 
         HTTPResponse response = connector.request(WebConnector.Method.PUT, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
 
+        System.out.println("Pre-WS initialization");
+
         JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
 
-        initializeWebSocketConnection();
+        initializeWebSocketConnection(color);
+
+        System.out.println("Post-WS initialization");
 
         this.webSocketConnector.joinPlayer(webSocketCommand);
+
+        System.out.println("Post WS execution");
     }
 
-    private void initializeWebSocketConnection() throws WebSocketException{
-        if(this.webSocketConnector == null){
+    private void initializeWebSocketConnection(ChessGame.TeamColor color) throws WebSocketException{
+        if(this.webSocketConnector != null){
             return;
         }
 
-        String url = "http://localhost:7777";
+        String url = this.connector.getUrl();
 
-        if (this.connector != null){
-            url = this.connector.getUrl();
-        }
+//        if (this.connector != null){
+//            url = this.connector.getUrl();
+//        }
 
-        this.webSocketConnector = new WebSocketConnector(url,  new ServerMessageHandler());
+        gameplayUI.setTeamColor(color);
+        this.webSocketConnector = new WebSocketConnector(url,  gameplayUI);
     }
 
 

@@ -12,6 +12,7 @@ import java.util.Objects;
 public class CommandProcessor {
 
     private Client client = null;
+    private GameplayUI gameplayUI = new GameplayUI();
 
     private Command[] loggedOutCommands = {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
@@ -168,8 +169,6 @@ public class CommandProcessor {
 
         Map<String, String> userInputs = client.UI().promptParameters(joinGameParams);
 
-        BoardPainter painter = new BoardPainter();
-
         try{
 
             Integer gameID = Integer.parseInt(userInputs.get("gameID"));
@@ -191,7 +190,6 @@ public class CommandProcessor {
 
             client.UI().printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
 
-            paintBoards();
 
         }
         catch(Exception e){

@@ -1,11 +1,11 @@
 package websockets;
 
+import chess.ChessGame;
 import webSocketMessages.serverMessages.ServerMessage;
 
-public class ServerMessageHandler {
+public interface ServerMessageHandler {
 
-    public void notify(ServerMessage message){
-        System.out.println("RECEIVED: " + message.getServerMessageType().toString());
-    }
+    public void receiveMessage(String message);
 
+    public void setTeamColor(ChessGame.TeamColor color);
 }
