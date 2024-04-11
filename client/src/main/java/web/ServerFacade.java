@@ -7,6 +7,10 @@ import data.requests.*;
 import data.responses.*;
 import model.AuthData;
 import model.GameData;
+import webSocketMessages.userCommands.JoinPlayerCommand;
+import websockets.ServerMessageHandler;
+import websockets.WebSocketConnector;
+import websockets.WebSocketException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,10 +19,13 @@ public class ServerFacade {
 
     private final Gson parser = new Gson();
     private WebConnector connector = null;
+    private WebSocketConnector webSocketConnector;
     private AuthData session;
 
     public ServerFacade(){
         connector = new WebConnector("http://localhost:7777");
+
+
     }
     public ServerFacade(String serverURL){
         connector = new WebConnector(serverURL);
@@ -118,6 +125,25 @@ public class ServerFacade {
 
         HTTPResponse response = connector.request(WebConnector.Method.PUT, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
 
+        JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
+
+        initializeWebSocketConnection();
+
+        this.webSocketConnector.joinPlayer(webSocketCommand);
+    }
+
+    private void initializeWebSocketConnection() throws WebSocketException{
+        if(this.webSocketConnector == null){
+            return;
+        }
+
+        String url = "http://localhost:7777";
+
+        if (this.connector != null){
+            url = this.connector.getUrl();
+        }
+
+        this.webSocketConnector = new WebSocketConnector(url,  new ServerMessageHandler());
     }
 
 
