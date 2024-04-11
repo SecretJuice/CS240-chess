@@ -35,17 +35,15 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws Exception{
         UserGameCommand command = parseMessage((message));
 
-        AuthData auth = authService.authenticateSession(command.getAuthString());
-        WebSocketConnection connection = connectionManager.add(auth, session);
+
 
         try{
-            if (auth == null){
-                throw new UnauthorizedException("Invalid Session");
-            }
+            AuthData auth = authService.authenticateSession(command.getAuthString());
+            WebSocketConnection connection = connectionManager.add(auth, session, command.getGameID());
             switch (command.getCommandType()){
                 case JOIN_PLAYER -> joinPlayer((JoinPlayerCommand) command, connection);
                 case JOIN_OBSERVER -> joinObserver((JoinObserverCommand) command, connection);
-                case LEAVE -> leave((LeaveCommand) command);
+                case LEAVE -> leave((LeaveCommand) command, connection);
                 case MAKE_MOVE -> makeMove((MakeMoveCommand) command, connection);
                 case RESIGN -> resign((ResignCommand) command, connection);
             }
@@ -53,7 +51,7 @@ public class WebSocketHandler {
         catch(Exception e){
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
             System.out.println(errorMessage.getMessage());
-            connection.send(new Gson().toJson(errorMessage));
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
 
     }
@@ -87,7 +85,7 @@ public class WebSocketHandler {
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
 
         connection.send(new Gson().toJson(loadGameMessage));
-        connectionManager.broadcast(connection.auth.authToken(), connection.auth.username() + " has joined team " + command.getPlayerColor().toString());
+        connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(), connection.auth.username() + " has joined team " + command.getPlayerColor().toString());
     }
 
     private void joinObserver(JoinObserverCommand command, WebSocketConnection connection) throws Exception{
@@ -101,11 +99,25 @@ public class WebSocketHandler {
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
 
         connection.send(new Gson().toJson(loadGameMessage));
-        connectionManager.broadcast(connection.auth.authToken(), connection.auth.username() + " is now spectating");
+        connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(),connection.auth.username() + " is now spectating");
     }
 
-    private void leave(LeaveCommand command) throws Exception{
-        throw new RuntimeException("LEAVE Not implemented");
+    private void leave(LeaveCommand command, WebSocketConnection connection) throws Exception{
+        GameData gameData = gameDAO.get(Integer.toString(command.getGameID()));
+
+
+        if (gameData == null){
+            throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
+        }
+
+        switch (getPlayerTeam(connection.auth.username(), gameData)){
+            case null -> {}
+            case WHITE -> gameDAO.update( new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
+            case BLACK -> gameDAO.update( new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
+        }
+
+        connectionManager.broadcast(null, command.getGameID(),connection.auth.username() + " has left the game");
+        connectionManager.remove(connection.auth);
     }
 
     private void makeMove(MakeMoveCommand command, WebSocketConnection connection) throws Exception{
@@ -137,8 +149,8 @@ public class WebSocketHandler {
         gameDAO.update(gameData);
 
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
-        connectionManager.syncGame(loadGameMessage);
-        connectionManager.broadcast(connection.auth.authToken(), username + " moved from " + command.getMove().getStartPosition().toString()
+        connectionManager.syncGame(loadGameMessage, gameData.gameID());
+        connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(),username + " moved from " + command.getMove().getStartPosition().toString()
                                                                                     + " to " + command.getMove().getEndPosition().toString());
     }
 
@@ -170,7 +182,7 @@ public class WebSocketHandler {
         gameData.game().setGameOver(true);
         gameDAO.update(gameData);
 
-        connectionManager.broadcast(null, connection.auth.username() + " has resigned the game");
+        connectionManager.broadcast(null, gameData.gameID(),connection.auth.username() + " has resigned the game");
     }
 
 }

@@ -10,10 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketConnection {
     AuthData auth;
     Session session;
+    Integer gameID;
 
-    public WebSocketConnection(AuthData authData, Session session){
+    public WebSocketConnection(AuthData authData, Session session, Integer gameID){
         this.auth = authData;
         this.session = session;
+        this.gameID = gameID;
     }
 
     public void send(String msg) throws IOException {

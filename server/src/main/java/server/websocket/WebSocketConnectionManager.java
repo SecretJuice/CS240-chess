@@ -9,26 +9,27 @@ import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketConnectionManager {
     public final ConcurrentHashMap<String, WebSocketConnection> connections = new ConcurrentHashMap<>();
 
-    public WebSocketConnection add(AuthData authData, Session session) {
-        var connection = new WebSocketConnection(authData, session);
+    public WebSocketConnection add(AuthData authData, Session session, Integer subbedGameID) {
+        var connection = new WebSocketConnection(authData, session, subbedGameID);
         connections.put(authData.authToken(), connection);
         return connection;
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(AuthData authData) {
+        connections.remove(authData.authToken());
     }
 
-    public void broadcast(String excludeConnection, String message) throws IOException {
+    public void broadcast(String excludeConnection, int lobbyID, String message) throws IOException {
         var removeList = new ArrayList<WebSocketConnection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.auth.authToken().equals(excludeConnection)) {
+                if (!c.auth.authToken().equals(excludeConnection) && Objects.equals(c.gameID, lobbyID)) {
                     NotificationMessage notification = new NotificationMessage(message);
                     c.send(new Gson().toJson(notification));
                 }
@@ -43,11 +44,14 @@ public class WebSocketConnectionManager {
         }
     }
 
-    public void syncGame(LoadGameMessage loadGameMessage) throws IOException {
+    public void syncGame(LoadGameMessage loadGameMessage, int lobbyID) throws IOException {
         var removeList = new ArrayList<WebSocketConnection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                c.send(new Gson().toJson(loadGameMessage));
+                if (c.gameID == lobbyID){
+
+                    c.send(new Gson().toJson(loadGameMessage));
+                }
 
             } else {
                 removeList.add(c);
