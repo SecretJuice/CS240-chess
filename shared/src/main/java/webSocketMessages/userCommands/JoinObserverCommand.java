@@ -5,12 +5,11 @@ public class JoinObserverCommand extends UserGameCommand{
         return gameID;
     }
 
-    private int gameID;
-
-    protected CommandType commandType = CommandType.JOIN_OBSERVER;
+    private Integer gameID;
 
     public JoinObserverCommand(String authToken, int gameID) {
         super(authToken);
+        super.commandType = CommandType.JOIN_OBSERVER;
         this.gameID = gameID;
     }
 

@@ -3,6 +3,7 @@ package server.websocket;
 import com.google.gson.Gson;
 import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 
@@ -37,6 +38,22 @@ public class WebSocketConnectionManager {
         }
 
         // Clean up any connections that were left open.
+        for (var c : removeList) {
+            connections.remove(c.auth.authToken());
+        }
+    }
+
+    public void syncGame(LoadGameMessage loadGameMessage) throws IOException {
+        var removeList = new ArrayList<WebSocketConnection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                c.send(new Gson().toJson(loadGameMessage));
+
+            } else {
+                removeList.add(c);
+            }
+        }
+
         for (var c : removeList) {
             connections.remove(c.auth.authToken());
         }
