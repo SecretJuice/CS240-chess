@@ -83,7 +83,7 @@ public class CommandProcessor {
 
         ui.printNormal("Quiting... thanks for playing!\n");
 
-        client.UI().stopREPL();
+        client.ui().stopREPL();
 
     }
 
@@ -97,7 +97,7 @@ public class CommandProcessor {
         Map<String, String> userInputs = ui.promptParameters(registerParams);
 
         try{
-            String username = client.Server().register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
+            String username = client.server().register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
             ui.printNormal("Welcome, " + username + "!\n");
         }
         catch(Exception e){
@@ -114,7 +114,7 @@ public class CommandProcessor {
         Map<String, String> userInputs = ui.promptParameters(loginParams);
 
         try{
-            String username = client.Server().login(userInputs.get("username"), userInputs.get("password"));
+            String username = client.server().login(userInputs.get("username"), userInputs.get("password"));
             ui.printNormal("Welcome, " + username + "!\n");
         }
         catch(Exception e){
@@ -125,7 +125,7 @@ public class CommandProcessor {
     private void logoutCommand(){
 
         try{
-            client.Server().logout();
+            client.server().logout();
         }
         catch (Exception e){
             ui.printError("Could not logout: " + e.getMessage() + "\n");
@@ -136,16 +136,16 @@ public class CommandProcessor {
     private void listGamesCommand(){
 
         try{
-            Collection<GameData> games = client.Server().listGames();
+            Collection<GameData> games = client.server().listGames();
 
-            client.SavedGames().clear();
+            client.savedGames().clear();
 
             int index = 1;
             for(GameData game : games){
 
                 String listing = "ID[ " + index + " ] " + game.gameName() + ": WHITE= " + game.whiteUsername() + ": BLACK= " + game.blackUsername();
 
-                client.SavedGames().put(index, game);
+                client.savedGames().put(index, game);
 
                 ui.printNormal(listing + "\n");
 
@@ -185,9 +185,9 @@ public class CommandProcessor {
                 throw new BadRequestException("Please enter a valid color (WHITE or BLACK)");
             }
 
-            GameData desiredGame = client.SavedGames().get(gameID);
+            GameData desiredGame = client.savedGames().get(gameID);
 
-            client.Server().joinGame(desiredGame.gameID(), color);
+            client.server().joinGame(desiredGame.gameID(), color);
 
             ui.printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
 
@@ -207,9 +207,9 @@ public class CommandProcessor {
         Integer gameID = Integer.parseInt(userInputs.get("gameID"));
 
         try{
-            GameData desiredGame = client.SavedGames().get(gameID);
+            GameData desiredGame = client.savedGames().get(gameID);
 
-            client.Server().joinGame(desiredGame.gameID(), null);
+            client.server().joinGame(desiredGame.gameID(), null);
 
             ui.printNormal("Now spectating the game... ID[" + gameID + "]\n");
         }
@@ -227,7 +227,7 @@ public class CommandProcessor {
         String gameName = userInputs.get("gameName");
 
         try{
-            client.Server().createGame(gameName);
+            client.server().createGame(gameName);
 
             ui.printNormal("Created Game!\n");
         }

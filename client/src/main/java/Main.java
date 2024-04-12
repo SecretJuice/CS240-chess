@@ -1,6 +1,5 @@
 import chess.*;
 import ui.Client;
-import ui.UserInterface;
 import web.ServerFacade;
 
 import static ui.EscapeSequences.RESET_BG_COLOR;
@@ -17,6 +16,6 @@ public class Main {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         Client client = new Client(serverFacade);
 
-        client.UI().startUI();
+        client.ui().startUI();
     }
 }

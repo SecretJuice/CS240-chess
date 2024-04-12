@@ -160,10 +160,6 @@ public class ServerFacade {
 
         String url = this.connector.getUrl();
 
-//        if (this.connector != null){
-//            url = this.connector.getUrl();
-//        }
-
         if(color == null){
             color = ChessGame.TeamColor.WHITE;
         }
