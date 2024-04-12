@@ -8,4 +8,5 @@ public interface ServerMessageHandler {
     public void receiveMessage(String message);
 
     public void setTeamColor(ChessGame.TeamColor color);
+    public void setGameID(int gameID);
 }

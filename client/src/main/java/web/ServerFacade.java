@@ -8,7 +8,9 @@ import data.responses.*;
 import model.AuthData;
 import model.GameData;
 import ui.GameplayUI;
+import webSocketMessages.userCommands.JoinObserverCommand;
 import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.LeaveCommand;
 import websockets.ServerMessageHandler;
 import websockets.WebSocketConnector;
 import websockets.WebSocketException;
@@ -22,7 +24,7 @@ public class ServerFacade {
     private WebConnector connector = null;
     private WebSocketConnector webSocketConnector;
     private AuthData session;
-    private ServerMessageHandler gameplayUI = new GameplayUI();
+    private ServerMessageHandler gameplayUI = new GameplayUI(this);
 
     public ServerFacade(){
         connector = new WebConnector("http://localhost:7777");
@@ -125,20 +127,33 @@ public class ServerFacade {
 
         HTTPResponse response = connector.request(WebConnector.Method.PUT, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
 
-        System.out.println("Pre-WS initialization");
 
-        JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
+        initializeWebSocketConnection(color, gameID);
 
-        initializeWebSocketConnection(color);
+        if (color == null){
 
-        System.out.println("Post-WS initialization");
+            JoinObserverCommand webSocketCommand = new JoinObserverCommand(this.session.authToken(), gameID);
+            this.webSocketConnector.joinObserver(webSocketCommand);
 
-        this.webSocketConnector.joinPlayer(webSocketCommand);
+        }
+        else{
+            JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
+            this.webSocketConnector.joinPlayer(webSocketCommand);
+        }
 
-        System.out.println("Post WS execution");
     }
 
-    private void initializeWebSocketConnection(ChessGame.TeamColor color) throws WebSocketException{
+    public void leaveGame(Integer gameID) throws Exception{
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        LeaveCommand webSocketCommand = new LeaveCommand(this.session.authToken(), gameID);
+        this.webSocketConnector.leave(webSocketCommand);
+
+    }
+
+    private void initializeWebSocketConnection(ChessGame.TeamColor color, int gameID) throws WebSocketException{
         if(this.webSocketConnector != null){
             return;
         }
@@ -149,7 +164,12 @@ public class ServerFacade {
 //            url = this.connector.getUrl();
 //        }
 
+        if(color == null){
+            color = ChessGame.TeamColor.WHITE;
+        }
+
         gameplayUI.setTeamColor(color);
+        gameplayUI.setGameID(gameID);
         this.webSocketConnector = new WebSocketConnector(url,  gameplayUI);
     }
 

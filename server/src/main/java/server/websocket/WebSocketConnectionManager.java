@@ -31,6 +31,7 @@ public class WebSocketConnectionManager {
             if (c.session.isOpen()) {
                 if (!c.auth.authToken().equals(excludeConnection) && Objects.equals(c.gameID, lobbyID)) {
                     NotificationMessage notification = new NotificationMessage(message);
+                    System.out.println(message);
                     c.send(new Gson().toJson(notification));
                 }
             } else {

@@ -20,7 +20,8 @@ public class UserInterface {
         isRunning = true;
 
         while (isRunning){
-            String[] command = uiUtils.promptCommand(client.isLoggedIn());
+            String prefix = client.isLoggedIn() ? "[LOGGED IN]>>" : "[LOGGED OUT]>>";
+            String[] command = uiUtils.promptCommand(prefix);
             client.Commands().processCommand(command);
         }
     }

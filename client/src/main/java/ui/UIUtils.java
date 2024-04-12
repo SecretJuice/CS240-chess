@@ -9,8 +9,7 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.RESET_TEXT_ITALIC;
 
 public class UIUtils {
-    public String[] promptCommand(boolean loggedIn){
-        String prefix = loggedIn ? "[LOGGED IN]>>> " : "[LOGGED OUT]>>> ";
+    public String[] promptCommand(String prefix){
 
         return prompt(prefix, this::printNormal).split(" ");
     }

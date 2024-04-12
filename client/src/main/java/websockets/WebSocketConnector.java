@@ -2,7 +2,9 @@ package websockets;
 
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.JoinObserverCommand;
 import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.LeaveCommand;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -54,7 +56,27 @@ public class WebSocketConnector extends Endpoint {
             throw new WebSocketException(500, e.getMessage());
         }
     }
+    public void joinObserver(JoinObserverCommand command) throws WebSocketException {
+        String message = new Gson().toJson(command);
+        try{
+            this.session.getBasicRemote().sendText(message);
+        }
+        catch(IOException e){
+            throw new WebSocketException(500, e.getMessage());
+        }
+    }
+
+    public void leave(LeaveCommand command) throws WebSocketException{
+        String message = new Gson().toJson(command);
+        try{
+            this.session.getBasicRemote().sendText(message);
+        }
+        catch(IOException e){
+            throw new WebSocketException(500, e.getMessage());
+        }
+    }
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
+
 }
