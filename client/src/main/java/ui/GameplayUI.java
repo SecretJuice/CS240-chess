@@ -40,8 +40,6 @@ public class GameplayUI implements ServerMessageHandler {
         BoardPainter painter = new BoardPainter();
 
         painter.paintBoard(message.getGame().getBoard(), teamColor);
-
-        gameplayREPL();
     }
 
     public void receiveMessage(String json) {
@@ -56,12 +54,6 @@ public class GameplayUI implements ServerMessageHandler {
         }
     }
 
-    private void gameplayREPL() {
-        while (inGame) {
-            String[] command = ui.promptCommand("[IN-GAME]>>");
-            processGameplayCommand(command);
-        }
-    }
 
     private void processGameplayCommand(String[] args) {
 

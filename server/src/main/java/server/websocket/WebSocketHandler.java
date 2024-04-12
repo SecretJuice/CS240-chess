@@ -122,7 +122,7 @@ public class WebSocketHandler {
             case BLACK -> gameDAO.update( new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
         }
 
-        connectionManager.broadcast(null, command.getGameID(),connection.auth.username() + " has left the game");
+        connectionManager.broadcast(connection.auth.authToken(), command.getGameID(),connection.auth.username() + " has left the game");
         connectionManager.remove(connection.auth);
     }
 
