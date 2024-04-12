@@ -33,14 +33,32 @@ public class CommandProcessor {
             new Command("spectate", this::spectateCommand, "Spectate a game in progress"),
     };
 
+    private Command[] inGameCommands = {
+            new Command("help", this::helpCommand, "Provides help for using available commands"),
+            new Command("leave", this::leaveCommand, "Exit the current game"),
+            new Command("move", this::moveCommand, "Move a chess piece"),
+            new Command("resign", this::resignCommand, "Forfeit the match"),
+            new Command("redraw", this::redrawCommand, "Print out the chess board again (in case something messes it up)"),
+            new Command("showmoves", this::showMovesCommand, "Show a pieces' valid moves"),
+
+    };
+
     public CommandProcessor (Client client){
         this.client = client;
+    }
+
+    private Command[] getCommandList(Client.State state){
+        return switch(state){
+            case LOGGEDIN -> loggedInCommands;
+            case LOGGEDOUT -> loggedOutCommands;
+            case INGAME -> inGameCommands;
+        };
     }
 
     public void processCommand(String[] args){
         if(args.length == 1){
 
-            Command[] commands = client.isLoggedIn() ? loggedInCommands : loggedOutCommands;
+            Command[] commands = getCommandList(client.getState());
             Command selectedCommand = null;
 
             String commandName = args[0];
@@ -71,7 +89,7 @@ public class CommandProcessor {
 
     private void helpCommand(){
 
-        Command[] commands = client.isLoggedIn() ? loggedInCommands : loggedOutCommands;
+        Command[] commands = getCommandList(client.getState());
 
         for(Command command : commands){
             ui.printNormal("  " + command.name() + "  |  " + command.description() + "\n");
@@ -99,6 +117,7 @@ public class CommandProcessor {
         try{
             String username = client.server().register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
             ui.printNormal("Welcome, " + username + "!\n");
+            client.setState(Client.State.LOGGEDIN);
         }
         catch(Exception e){
             ui.printError("Registration Failed: " + e.getMessage() + "\n");
@@ -116,6 +135,7 @@ public class CommandProcessor {
         try{
             String username = client.server().login(userInputs.get("username"), userInputs.get("password"));
             ui.printNormal("Welcome, " + username + "!\n");
+            client.setState(Client.State.LOGGEDIN);
         }
         catch(Exception e){
             ui.printError("Login Failed: " + e.getMessage() + "\n");
@@ -126,6 +146,7 @@ public class CommandProcessor {
 
         try{
             client.server().logout();
+            client.setState(Client.State.LOGGEDOUT);
         }
         catch (Exception e){
             ui.printError("Could not logout: " + e.getMessage() + "\n");
@@ -186,15 +207,17 @@ public class CommandProcessor {
             }
 
             GameData desiredGame = client.savedGames().get(gameID);
-
+            client.setJoinedGame(desiredGame);
             client.server().joinGame(desiredGame.gameID(), color);
 
+            client.setState(Client.State.INGAME);
             ui.printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
 
 
         }
         catch(Exception e){
             ui.printError("Could not join game: " + e.getMessage() + "\n");
+            client.setJoinedGame(null);
         }
     }
 
@@ -208,13 +231,15 @@ public class CommandProcessor {
 
         try{
             GameData desiredGame = client.savedGames().get(gameID);
-
+            client.setJoinedGame(desiredGame);
             client.server().joinGame(desiredGame.gameID(), null);
 
             ui.printNormal("Now spectating the game... ID[" + gameID + "]\n");
+            client.setState(Client.State.INGAME);
         }
         catch(Exception e){
             ui.printError("Could not spectate game: " + e.getMessage() + "\n");
+            client.setJoinedGame(null);
         }
     }
 
@@ -233,6 +258,105 @@ public class CommandProcessor {
         }
         catch(Exception e){
             ui.printError("Could not create game: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void leaveCommand() {
+        GameData currentGame = client.getJoinedGame();
+
+        try{
+            client.server().leaveGame(currentGame.gameID());
+            ui.printNormal("Left the game" + "\n");
+            client.setState(Client.State.LOGGEDIN);
+
+        }
+        catch(Exception e){
+            ui.printError("Failed to leave: " + e.getMessage() + "\n");
+        }
+    }
+
+
+    private void moveCommand(){
+        GameData currentGame = client.getJoinedGame();
+
+        HashMap<String, String> moveParams = new HashMap<>();
+        moveParams.put("chessMove", "Move (e.g e2e4)");
+
+        Map<String, String> userInputs = ui.promptParameters(moveParams);
+
+        String moveText = userInputs.get("chessMove").toLowerCase().trim();
+
+        try{
+            ChessMove chessMove = createChessMove(moveText, currentGame.game().getBoard());
+            client.server().makeMove(currentGame.gameID(), chessMove);
+        }
+        catch(Exception e){
+            ui.printError("Could not move: " + e.getMessage());
+        }
+    }
+
+    private ChessMove createChessMove(String moveText, ChessBoard board) throws Exception{
+        if( moveText.length() != 4){
+            throw new Exception("Must be exactly 4 characters long");
+        }
+
+        ChessPosition startPos = new ChessPosition((int)moveText.charAt(1) - 48, (int)moveText.charAt(0) - 96);
+        ChessPosition endPos = new ChessPosition((int)moveText.charAt(3) - 48, (int)moveText.charAt(2) - 96);
+
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (board.getPiece(startPos).getPieceType() == ChessPiece.PieceType.PAWN &&
+                (endPos.getRow() == 8 || endPos.getRow() == 1)){
+
+            HashMap<String, String> promotionParams = new HashMap<>();
+            promotionParams.put("promotion", "Pawn Promotion: (e.g QUEEN, KNIGHT)");
+
+            Map<String, String> userInputs = ui.promptParameters(promotionParams);
+
+            try{
+                promotionPiece = ChessPiece.PieceType.valueOf(userInputs.get("promotion").toUpperCase().trim());
+            }
+            catch(IllegalArgumentException e){
+                ui.printError("Invalid piece type, selecting QUEEN by default");
+                promotionPiece = ChessPiece.PieceType.QUEEN;
+            }
+        }
+
+        return new ChessMove(startPos, endPos, promotionPiece);
+    }
+
+    private void resignCommand(){
+        GameData currentGame = client.getJoinedGame();
+
+        try{
+            client.server().resignGame(currentGame.gameID());
+            ui.printNormal("You resigned from the game" + "\n");
+
+        }
+        catch(Exception e){
+            ui.printError("Failed to resign: " + e.getMessage() + "\n");
+        }
+    }
+    private void showMovesCommand(){
+        ui.printError("Whoops! Didn't make that :/" + "\n");
+    }
+    private void redrawCommand(){
+        ChessGame.TeamColor playerColor = getPlayerTeam(client.server().getSession().username(), client.getJoinedGame());
+
+        BoardPainter painter = new BoardPainter();
+
+        painter.paintBoard(client.getJoinedGame().game().getBoard(), playerColor);
+    }
+
+    private ChessGame.TeamColor getPlayerTeam(String username, GameData gameData){
+        if (Objects.equals(username, gameData.whiteUsername())){
+            return ChessGame.TeamColor.WHITE;
+        }
+        else if (Objects.equals(username, gameData.blackUsername())){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else {
+            return null;
         }
     }
 

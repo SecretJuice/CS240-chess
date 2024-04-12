@@ -7,6 +7,30 @@ import java.util.HashMap;
 
 public class Client {
 
+    public enum State{
+        LOGGEDOUT,
+        LOGGEDIN,
+        INGAME
+    }
+
+    private State state = State.LOGGEDOUT;
+    public void setState(State state){
+        this.state = state;
+    }
+    public State getState(){
+        return state;
+    }
+
+    public GameData getJoinedGame() {
+        return joinedGame;
+    }
+
+    public void setJoinedGame(GameData joinedGame) {
+        this.joinedGame = joinedGame;
+    }
+
+    private GameData joinedGame;
+
     private UserInterface ui = new UserInterface(this);
 
     public UserInterface ui(){
@@ -33,6 +57,7 @@ public class Client {
 
     public Client(ServerFacade serverFacade){
         server = serverFacade;
+        serverFacade.setClient(this);
     }
 
     public boolean isLoggedIn(){

@@ -15,7 +15,7 @@ public class UserInterface {
         isRunning = true;
 
         while (isRunning){
-            String prefix = client.isLoggedIn() ? "[LOGGED IN]>>" : "[LOGGED OUT]>>";
+            String prefix = "[" + client.getState().toString() + "]>> ";
             String[] command = uiUtils.promptCommand(prefix);
             client.commands().processCommand(command);
         }

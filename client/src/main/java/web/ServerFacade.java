@@ -1,16 +1,16 @@
 package web;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import com.google.gson.Gson;
 import data.requests.*;
 import data.responses.*;
 import model.AuthData;
 import model.GameData;
+import ui.Client;
 import ui.GameplayUI;
-import webSocketMessages.userCommands.JoinObserverCommand;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.LeaveCommand;
+import webSocketMessages.userCommands.*;
 import websockets.ServerMessageHandler;
 import websockets.WebSocketConnector;
 import websockets.WebSocketException;
@@ -24,7 +24,12 @@ public class ServerFacade {
     private WebConnector connector = null;
     private WebSocketConnector webSocketConnector;
     private AuthData session;
-    private ServerMessageHandler gameplayUI = new GameplayUI(this);
+    private ServerMessageHandler gameplayUI;
+    private Client client;
+    public void setClient(Client client){
+        this.client = client;
+        this.gameplayUI = new GameplayUI(client);
+    }
 
     public ServerFacade(){
         connector = new WebConnector("http://localhost:7777");
@@ -153,6 +158,25 @@ public class ServerFacade {
 
     }
 
+    public void resignGame(Integer gameID) throws Exception {
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        ResignCommand webSocketCommand = new ResignCommand(this.session.authToken(), gameID);
+        this.webSocketConnector.sendCommand(webSocketCommand);
+    }
+
+    public void makeMove(Integer gameID, ChessMove move) throws Exception {
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        MakeMoveCommand webSocketCommand = new MakeMoveCommand(this.session.authToken(), gameID, move);
+        this.webSocketConnector.sendCommand(webSocketCommand);
+    }
+
+
     private void initializeWebSocketConnection(ChessGame.TeamColor color, int gameID) throws WebSocketException{
         if(this.webSocketConnector != null){
             return;
@@ -168,6 +192,7 @@ public class ServerFacade {
         gameplayUI.setGameID(gameID);
         this.webSocketConnector = new WebSocketConnector(url,  gameplayUI);
     }
+
 
 
 }

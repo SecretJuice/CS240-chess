@@ -40,8 +40,6 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws Exception{
         UserGameCommand command = parseMessage((message));
 
-        System.out.println("RECEIVED CLIENT MESSAGE: " + message);
-
         try{
             AuthData auth = authService.authenticateSession(command.getAuthString());
             WebSocketConnection connection = connectionManager.add(auth, session, command.getGameID());
@@ -90,8 +88,6 @@ public class WebSocketHandler {
 
         connection.send(new Gson().toJson(loadGameMessage));
         connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(), connection.auth.username() + " has joined team " + command.getPlayerColor().toString());
-
-        System.out.println("REPLYING");
     }
 
     private void joinObserver(JoinObserverCommand command, WebSocketConnection connection) throws Exception{
@@ -122,7 +118,7 @@ public class WebSocketHandler {
             case BLACK -> gameDAO.update( new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
         }
 
-        connectionManager.broadcast(null, command.getGameID(),connection.auth.username() + " has left the game");
+        connectionManager.broadcast(connection.auth.authToken(), command.getGameID(),connection.auth.username() + " has left the game");
         connectionManager.remove(connection.auth);
     }
 
@@ -158,6 +154,10 @@ public class WebSocketHandler {
         connectionManager.syncGame(loadGameMessage, gameData.gameID());
         connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(),username + " moved from " + command.getMove().getStartPosition().toString()
                                                                                     + " to " + command.getMove().getEndPosition().toString());
+
+        if (game.isGameOver()){
+            connectionManager.broadcast(null, gameData.gameID(),"The game is over! Congrats to the victor!");
+        }
     }
 
     private ChessGame.TeamColor getPlayerTeam(String username, GameData gameData){
@@ -188,7 +188,7 @@ public class WebSocketHandler {
         gameData.game().setGameOver(true);
         gameDAO.update(gameData);
 
-        connectionManager.broadcast(null, gameData.gameID(),connection.auth.username() + " has resigned the game");
+        connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(),connection.auth.username() + " has resigned the game");
     }
 
 }
