@@ -112,12 +112,12 @@ public class WebConnector {
     private String readErrorBody(HttpURLConnection http) throws IOException {
         StringBuilder responseBody = new StringBuilder();
 
-        try (InputStream respBody = http.getErrorStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            BufferedReader br = new BufferedReader(inputStreamReader);
+        try (InputStream errorBody = http.getErrorStream()) {
+            InputStreamReader errorStreamReader = new InputStreamReader(errorBody);
+            BufferedReader ebr = new BufferedReader(errorStreamReader);
 
             String line;
-            while((line = br.readLine()) != null){
+            while((line = ebr.readLine()) != null){
 
                 responseBody.append(line);
             }

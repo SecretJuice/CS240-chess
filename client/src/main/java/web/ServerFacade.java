@@ -133,12 +133,12 @@ public class ServerFacade {
         if (color == null){
 
             JoinObserverCommand webSocketCommand = new JoinObserverCommand(this.session.authToken(), gameID);
-            this.webSocketConnector.joinObserver(webSocketCommand);
+            this.webSocketConnector.sendCommand(webSocketCommand);
 
         }
         else{
             JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
-            this.webSocketConnector.joinPlayer(webSocketCommand);
+            this.webSocketConnector.sendCommand(webSocketCommand);
         }
 
     }
@@ -149,7 +149,7 @@ public class ServerFacade {
         }
 
         LeaveCommand webSocketCommand = new LeaveCommand(this.session.authToken(), gameID);
-        this.webSocketConnector.leave(webSocketCommand);
+        this.webSocketConnector.sendCommand(webSocketCommand);
 
     }
 
