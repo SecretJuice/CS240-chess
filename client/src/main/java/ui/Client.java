@@ -57,6 +57,7 @@ public class Client {
 
     public Client(ServerFacade serverFacade){
         server = serverFacade;
+        serverFacade.setClient(this);
     }
 
     public boolean isLoggedIn(){

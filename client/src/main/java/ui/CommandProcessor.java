@@ -275,10 +275,90 @@ public class CommandProcessor {
         }
     }
 
-    private void moveCommand(){}
-    private void resignCommand(){}
-    private void showMovesCommand(){}
-    private void redrawCommand(){}
+
+    private void moveCommand(){
+        GameData currentGame = client.getJoinedGame();
+
+        HashMap<String, String> moveParams = new HashMap<>();
+        moveParams.put("chessMove", "Move (e.g e2e4)");
+
+        Map<String, String> userInputs = ui.promptParameters(moveParams);
+
+        String moveText = userInputs.get("chessMove").toLowerCase().trim();
+
+        try{
+            ChessMove chessMove = createChessMove(moveText, currentGame.game().getBoard());
+            client.server().makeMove(currentGame.gameID(), chessMove);
+        }
+        catch(Exception e){
+            ui.printError("Could not move: " + e.getMessage());
+        }
+    }
+
+    private ChessMove createChessMove(String moveText, ChessBoard board) throws Exception{
+        if( moveText.length() != 4){
+            throw new Exception("Must be exactly 4 characters long");
+        }
+
+        ChessPosition startPos = new ChessPosition((int)moveText.charAt(1) - 48, (int)moveText.charAt(0) - 96);
+        ChessPosition endPos = new ChessPosition((int)moveText.charAt(3) - 48, (int)moveText.charAt(2) - 96);
+
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (board.getPiece(startPos).getPieceType() == ChessPiece.PieceType.PAWN &&
+                (endPos.getRow() == 8 || endPos.getRow() == 1)){
+
+            HashMap<String, String> promotionParams = new HashMap<>();
+            promotionParams.put("promotion", "Pawn Promotion: (e.g QUEEN, KNIGHT)");
+
+            Map<String, String> userInputs = ui.promptParameters(promotionParams);
+
+            try{
+                promotionPiece = ChessPiece.PieceType.valueOf(userInputs.get("promotion").toUpperCase().trim());
+            }
+            catch(IllegalArgumentException e){
+                ui.printError("Invalid piece type, selecting QUEEN by default");
+                promotionPiece = ChessPiece.PieceType.QUEEN;
+            }
+        }
+
+        return new ChessMove(startPos, endPos, promotionPiece);
+    }
+
+    private void resignCommand(){
+        GameData currentGame = client.getJoinedGame();
+
+        try{
+            client.server().resignGame(currentGame.gameID());
+            ui.printNormal("You resigned from the game" + "\n");
+
+        }
+        catch(Exception e){
+            ui.printError("Failed to resign: " + e.getMessage() + "\n");
+        }
+    }
+    private void showMovesCommand(){
+        ui.printError("Whoops! Didn't make that :/" + "\n");
+    }
+    private void redrawCommand(){
+        ChessGame.TeamColor playerColor = getPlayerTeam(client.server().getSession().username(), client.getJoinedGame());
+
+        BoardPainter painter = new BoardPainter();
+
+        painter.paintBoard(client.getJoinedGame().game().getBoard(), playerColor);
+    }
+
+    private ChessGame.TeamColor getPlayerTeam(String username, GameData gameData){
+        if (Objects.equals(username, gameData.whiteUsername())){
+            return ChessGame.TeamColor.WHITE;
+        }
+        else if (Objects.equals(username, gameData.blackUsername())){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else {
+            return null;
+        }
+    }
 
     private void paintboardCommand() {
 

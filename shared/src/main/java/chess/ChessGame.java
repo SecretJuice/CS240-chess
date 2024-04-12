@@ -42,6 +42,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
+        checkEndCondition(team);
         currentTeamTurn = team;
     }
 
@@ -82,6 +83,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
         if (isGameOver()){
             throw new InvalidMoveException("The game is over!");
         }
@@ -233,7 +235,6 @@ public class ChessGame {
 
         teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
 
-        setGameOver(true);
 
         return teamMoves.isEmpty();
         // get if in check
@@ -277,10 +278,15 @@ public class ChessGame {
 
         teamMoves = teamMoves.stream().filter(move -> filterMoveForCheck(move, teamColor)).collect(Collectors.toSet());
 
-        setGameOver(true);
 
         return teamMoves.isEmpty();
 
+    }
+
+    private void checkEndCondition(TeamColor color){
+        if (isInCheckmate(color) || isInStalemate(color)){
+            setGameOver(true);
+        }
     }
 
     /**
