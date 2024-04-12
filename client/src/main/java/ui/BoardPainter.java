@@ -23,12 +23,7 @@ public class BoardPainter {
                 boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
 
                 for(int col = 8; col >= 1; col --){
-                    ChessPosition pos = new ChessPosition(row, col);
-                    ChessPiece piece = board.getPiece(pos);
-
-                    String cellString = constructCell(pos, piece);
-
-                    boardString.append(cellString);
+                    processPos(board, boardString, row, col);
                 }
                 boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
                 boardString.append("\n");
@@ -44,12 +39,7 @@ public class BoardPainter {
                 boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
 
                 for(int col = 1; col <= 8; col ++){
-                    ChessPosition pos = new ChessPosition(row, col);
-                    ChessPiece piece = board.getPiece(pos);
-
-                    String cellString = constructCell(pos, piece);
-
-                    boardString.append(cellString);
+                    processPos(board, boardString, row, col);
                 }
                 boardString.append(SET_TEXT_COLOR_LIGHT_GREY + " " + row + " " + RESET_TEXT_COLOR);
                 boardString.append("\n");
@@ -61,6 +51,15 @@ public class BoardPainter {
         System.out.print(boardString.toString());
 
 
+    }
+
+    private void processPos(ChessBoard board, StringBuilder builder, int row, int col){
+        ChessPosition pos = new ChessPosition(row, col);
+        ChessPiece piece = board.getPiece(pos);
+
+        String cellString = constructCell(pos, piece);
+
+        builder.append(cellString);
     }
 
     private String constructCell(ChessPosition position, ChessPiece piece){

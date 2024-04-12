@@ -1,10 +1,5 @@
 package ui;
 
-import java.util.*;
-import java.util.function.Consumer;
-
-import static ui.EscapeSequences.*;
-
 public class UserInterface {
 
     private Client client = null;
@@ -22,7 +17,7 @@ public class UserInterface {
         while (isRunning){
             String prefix = client.isLoggedIn() ? "[LOGGED IN]>>" : "[LOGGED OUT]>>";
             String[] command = uiUtils.promptCommand(prefix);
-            client.Commands().processCommand(command);
+            client.commands().processCommand(command);
         }
     }
 
