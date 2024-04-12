@@ -19,6 +19,10 @@ import java.net.URISyntaxException;
 public class WebConnector {
 
     private final String url;
+
+    public String getUrl(){
+        return this.url;
+    }
     private final Gson parser = new Gson();
 
     public WebConnector(String baseURL){

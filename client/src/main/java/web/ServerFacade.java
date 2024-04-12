@@ -7,6 +7,13 @@ import data.requests.*;
 import data.responses.*;
 import model.AuthData;
 import model.GameData;
+import ui.GameplayUI;
+import webSocketMessages.userCommands.JoinObserverCommand;
+import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.LeaveCommand;
+import websockets.ServerMessageHandler;
+import websockets.WebSocketConnector;
+import websockets.WebSocketException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +22,9 @@ public class ServerFacade {
 
     private final Gson parser = new Gson();
     private WebConnector connector = null;
+    private WebSocketConnector webSocketConnector;
     private AuthData session;
+    private ServerMessageHandler gameplayUI = new GameplayUI(this);
 
     public ServerFacade(){
         connector = new WebConnector("http://localhost:7777");
@@ -118,6 +127,50 @@ public class ServerFacade {
 
         HTTPResponse response = connector.request(WebConnector.Method.PUT, WebConnector.EndPoint.GAME, session.authToken(), requestBody);
 
+
+        initializeWebSocketConnection(color, gameID);
+
+        if (color == null){
+
+            JoinObserverCommand webSocketCommand = new JoinObserverCommand(this.session.authToken(), gameID);
+            this.webSocketConnector.joinObserver(webSocketCommand);
+
+        }
+        else{
+            JoinPlayerCommand webSocketCommand = new JoinPlayerCommand(this.session.authToken(), gameID, color);
+            this.webSocketConnector.joinPlayer(webSocketCommand);
+        }
+
+    }
+
+    public void leaveGame(Integer gameID) throws Exception{
+        if(session == null){
+            throw new UnauthorizedException("Not logged in.");
+        }
+
+        LeaveCommand webSocketCommand = new LeaveCommand(this.session.authToken(), gameID);
+        this.webSocketConnector.leave(webSocketCommand);
+
+    }
+
+    private void initializeWebSocketConnection(ChessGame.TeamColor color, int gameID) throws WebSocketException{
+        if(this.webSocketConnector != null){
+            return;
+        }
+
+        String url = this.connector.getUrl();
+
+//        if (this.connector != null){
+//            url = this.connector.getUrl();
+//        }
+
+        if(color == null){
+            color = ChessGame.TeamColor.WHITE;
+        }
+
+        gameplayUI.setTeamColor(color);
+        gameplayUI.setGameID(gameID);
+        this.webSocketConnector = new WebSocketConnector(url,  gameplayUI);
     }
 
 

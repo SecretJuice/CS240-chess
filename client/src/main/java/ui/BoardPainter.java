@@ -12,6 +12,7 @@ public class BoardPainter {
     public void paintBoard(ChessBoard board, ChessGame.TeamColor color){
 
         StringBuilder boardString = new StringBuilder();
+        boardString.append("\n\n");
 
         if(color == ChessGame.TeamColor.BLACK){
 

@@ -1,5 +1,6 @@
 package server.services;
 
+import chess.ChessGame;
 import dataAccess.DataAccessObject;
 import dataAccess.ItemAlreadyExistsException;
 import model.GameData;
@@ -20,6 +21,10 @@ public class GameCreationService extends Service{
     public GameData createGame (String gameName) throws Exception{
 
             GameData newGame = gameFactory.createData(gameName);
+
+            //Initialize Game Board
+            newGame.game().getBoard().resetBoard();
+            newGame.game().setTeamTurn(ChessGame.TeamColor.WHITE);
 
             try {
                 gameDAO.create(newGame);

@@ -12,6 +12,8 @@ import java.util.Objects;
 public class CommandProcessor {
 
     private Client client = null;
+    
+    private UIUtils ui = new UIUtils();
 
     private Command[] loggedOutCommands = {
             new Command("help", this::helpCommand, "Provides help for using available commands"),
@@ -51,7 +53,7 @@ public class CommandProcessor {
             }
 
             if(selectedCommand == null){
-                client.UI().printError("Unknown command ["+ commandName +"]\n");
+                ui.printError("Unknown command ["+ commandName +"]\n");
             }
             else if(selectedCommand.function() == null){
                 throw new RuntimeException("Command not implemented: " + selectedCommand.name() + "\n");
@@ -63,7 +65,7 @@ public class CommandProcessor {
         }
         else {
 
-            client.UI().printError("Too many arguments\n");
+            ui.printError("Too many arguments\n");
         }
     }
 
@@ -72,14 +74,14 @@ public class CommandProcessor {
         Command[] commands = client.isLoggedIn() ? loggedInCommands : loggedOutCommands;
 
         for(Command command : commands){
-            client.UI().printNormal("  " + command.name() + "  |  " + command.description() + "\n");
+            ui.printNormal("  " + command.name() + "  |  " + command.description() + "\n");
         }
 
     }
 
     private void quitCommand(){
 
-        client.UI().printNormal("Quiting... thanks for playing!\n");
+        ui.printNormal("Quiting... thanks for playing!\n");
 
         client.UI().stopREPL();
 
@@ -92,14 +94,14 @@ public class CommandProcessor {
         registerParams.put("password", "Password");
         registerParams.put("email", "Email (Optional)");
 
-        Map<String, String> userInputs = client.UI().promptParameters(registerParams);
+        Map<String, String> userInputs = ui.promptParameters(registerParams);
 
         try{
             String username = client.Server().register(userInputs.get("username"), userInputs.get("password"), userInputs.get("email"));
-            client.UI().printNormal("Welcome, " + username + "!\n");
+            ui.printNormal("Welcome, " + username + "!\n");
         }
         catch(Exception e){
-            client.UI().printError("Registration Failed: " + e.getMessage() + "\n");
+            ui.printError("Registration Failed: " + e.getMessage() + "\n");
         }
     }
 
@@ -109,14 +111,14 @@ public class CommandProcessor {
         loginParams.put("username", "Username");
         loginParams.put("password", "Password");
 
-        Map<String, String> userInputs = client.UI().promptParameters(loginParams);
+        Map<String, String> userInputs = ui.promptParameters(loginParams);
 
         try{
             String username = client.Server().login(userInputs.get("username"), userInputs.get("password"));
-            client.UI().printNormal("Welcome, " + username + "!\n");
+            ui.printNormal("Welcome, " + username + "!\n");
         }
         catch(Exception e){
-            client.UI().printError("Login Failed: " + e.getMessage() + "\n");
+            ui.printError("Login Failed: " + e.getMessage() + "\n");
         }
     }
 
@@ -126,7 +128,7 @@ public class CommandProcessor {
             client.Server().logout();
         }
         catch (Exception e){
-            client.UI().printError("Could not logout: " + e.getMessage() + "\n");
+            ui.printError("Could not logout: " + e.getMessage() + "\n");
         }
 
     }
@@ -145,18 +147,18 @@ public class CommandProcessor {
 
                 client.SavedGames().put(index, game);
 
-                client.UI().printNormal(listing + "\n");
+                ui.printNormal(listing + "\n");
 
                 index += 1;
 
             }
 
             if (games.isEmpty()){
-                client.UI().printNormal("There are currently no games. Use 'creategame' to start one!\n");
+                ui.printNormal("There are currently no games. Use 'creategame' to start one!\n");
             }
         }
         catch(Exception e){
-            client.UI().printError("Could not get games: " + "\n");
+            ui.printError("Could not get games: " + "\n");
         }
 
     }
@@ -166,9 +168,7 @@ public class CommandProcessor {
         joinGameParams.put("gameID", "Game ID (Enter a number. i.e ID [ 1 ] would be 1)");
         joinGameParams.put("teamcolor", "Color (type WHITE or BLACK)");
 
-        Map<String, String> userInputs = client.UI().promptParameters(joinGameParams);
-
-        BoardPainter painter = new BoardPainter();
+        Map<String, String> userInputs = ui.promptParameters(joinGameParams);
 
         try{
 
@@ -189,13 +189,12 @@ public class CommandProcessor {
 
             client.Server().joinGame(desiredGame.gameID(), color);
 
-            client.UI().printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
+            ui.printNormal("Successfully joined the game! ID:["+ gameID +"]\n");
 
-            paintBoards();
 
         }
         catch(Exception e){
-            client.UI().printError("Could not join game: " + e.getMessage() + "\n");
+            ui.printError("Could not join game: " + e.getMessage() + "\n");
         }
     }
 
@@ -203,7 +202,7 @@ public class CommandProcessor {
         HashMap<String, String> spectateParams = new HashMap<>();
         spectateParams.put("gameID", "Game ID (Enter a number)");
 
-        Map<String, String> userInputs = client.UI().promptParameters(spectateParams);
+        Map<String, String> userInputs = ui.promptParameters(spectateParams);
 
         Integer gameID = Integer.parseInt(userInputs.get("gameID"));
 
@@ -212,12 +211,10 @@ public class CommandProcessor {
 
             client.Server().joinGame(desiredGame.gameID(), null);
 
-            client.UI().printNormal("Now spectating the game... ID[" + gameID + "]\n");
-
-            paintBoards();
+            ui.printNormal("Now spectating the game... ID[" + gameID + "]\n");
         }
         catch(Exception e){
-            client.UI().printError("Could not spectate game: " + e.getMessage() + "\n");
+            ui.printError("Could not spectate game: " + e.getMessage() + "\n");
         }
     }
 
@@ -225,17 +222,17 @@ public class CommandProcessor {
         HashMap<String, String> createGameParams = new HashMap<>();
         createGameParams.put("gameName", "Game Name");
 
-        Map<String, String> userInputs = client.UI().promptParameters(createGameParams);
+        Map<String, String> userInputs = ui.promptParameters(createGameParams);
 
         String gameName = userInputs.get("gameName");
 
         try{
             client.Server().createGame(gameName);
 
-            client.UI().printNormal("Created Game!\n");
+            ui.printNormal("Created Game!\n");
         }
         catch(Exception e){
-            client.UI().printError("Could not create game: " + e.getMessage() + "\n");
+            ui.printError("Could not create game: " + e.getMessage() + "\n");
         }
     }
 
@@ -256,12 +253,12 @@ public class CommandProcessor {
 
             painter.paintBoard(board, ChessGame.TeamColor.BLACK);
 
-            client.UI().printNormal("\n");
+            ui.printNormal("\n");
 
             painter.paintBoard(board, ChessGame.TeamColor.WHITE);
         }
         catch(Exception e){
-            client.UI().printError(e.getMessage() + "\n");
+            ui.printError(e.getMessage() + "\n");
         }
     }
 
