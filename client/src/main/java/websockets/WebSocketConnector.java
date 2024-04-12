@@ -5,6 +5,7 @@ import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinObserverCommand;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.LeaveCommand;
+import webSocketMessages.userCommands.UserGameCommand;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -47,26 +48,7 @@ public class WebSocketConnector extends Endpoint {
         }
     }
 
-    public void joinPlayer(JoinPlayerCommand command) throws WebSocketException{
-        String message = new Gson().toJson(command);
-        try{
-            this.session.getBasicRemote().sendText(message);
-        }
-        catch(IOException e){
-            throw new WebSocketException(500, e.getMessage());
-        }
-    }
-    public void joinObserver(JoinObserverCommand command) throws WebSocketException {
-        String message = new Gson().toJson(command);
-        try{
-            this.session.getBasicRemote().sendText(message);
-        }
-        catch(IOException e){
-            throw new WebSocketException(500, e.getMessage());
-        }
-    }
-
-    public void leave(LeaveCommand command) throws WebSocketException{
+    public void sendCommand(UserGameCommand command) throws WebSocketException {
         String message = new Gson().toJson(command);
         try{
             this.session.getBasicRemote().sendText(message);
