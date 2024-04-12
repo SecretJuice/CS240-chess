@@ -62,22 +62,4 @@ public class GameplayUI implements ServerMessageHandler {
         }
     }
 
-
-    private void processGameplayCommand(String[] args) {
-
-        try{
-
-            switch (args[0].toLowerCase().trim()) {
-                case "leave" -> leaveGame();
-            }
-        }
-        catch(Exception e){
-            ui.printError(e.getMessage() + "\n");
-        }
-    }
-
-    private void leaveGame() throws Exception {
-        server.leaveGame(gameID);
-        inGame = false;
-    }
 }

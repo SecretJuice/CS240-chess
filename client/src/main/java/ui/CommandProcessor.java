@@ -341,23 +341,11 @@ public class CommandProcessor {
         ui.printError("Whoops! Didn't make that :/" + "\n");
     }
     private void redrawCommand(){
-        ChessGame.TeamColor playerColor = getPlayerTeam(client.server().getSession().username(), client.getJoinedGame());
+        ChessGame.TeamColor playerColor = client.getJoinedGame().getPlayerTeam(client.server().getSession().username());
 
         BoardPainter painter = new BoardPainter();
 
         painter.paintBoard(client.getJoinedGame().game().getBoard(), playerColor);
-    }
-
-    private ChessGame.TeamColor getPlayerTeam(String username, GameData gameData){
-        if (Objects.equals(username, gameData.whiteUsername())){
-            return ChessGame.TeamColor.WHITE;
-        }
-        else if (Objects.equals(username, gameData.blackUsername())){
-            return ChessGame.TeamColor.BLACK;
-        }
-        else {
-            return null;
-        }
     }
 
     private void paintboardCommand() {

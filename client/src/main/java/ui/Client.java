@@ -60,13 +60,4 @@ public class Client {
         serverFacade.setClient(this);
     }
 
-    public boolean isLoggedIn(){
-
-        if (server != null){
-
-            return server.getSession() != null;
-        }
-        return false;
-    }
-
 }
