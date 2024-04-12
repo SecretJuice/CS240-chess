@@ -78,7 +78,7 @@ public class WebSocketHandler {
             throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
         }
 
-        if (getPlayerTeam(connection.auth.username(), gameData) != command.getPlayerColor()){
+        if (gameData.getPlayerTeam(connection.auth.username()) != command.getPlayerColor()){
 
             throw new ForbiddenException("User not joined under specified color " + command.getPlayerColor());
         }
@@ -112,7 +112,7 @@ public class WebSocketHandler {
             throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
         }
 
-        switch (getPlayerTeam(connection.auth.username(), gameData)){
+        switch (gameData.getPlayerTeam(connection.auth.username())){
             case null -> {}
             case WHITE -> gameDAO.update( new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
             case BLACK -> gameDAO.update( new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
@@ -133,9 +133,9 @@ public class WebSocketHandler {
         ChessGame game = gameData.game();
         String username = connection.auth.username();
 
-        if (game.getTeamTurn() != getPlayerTeam(username, gameData)){
+        if (game.getTeamTurn() != gameData.getPlayerTeam(username)){
 
-            if (getPlayerTeam(username, gameData) == null){
+            if (gameData.getPlayerTeam(username) == null){
                 throw new ForbiddenException("User is not playing in this game.");
             }
 
@@ -160,25 +160,13 @@ public class WebSocketHandler {
         }
     }
 
-    private ChessGame.TeamColor getPlayerTeam(String username, GameData gameData){
-        if (Objects.equals(username, gameData.whiteUsername())){
-            return ChessGame.TeamColor.WHITE;
-        }
-        else if (Objects.equals(username, gameData.blackUsername())){
-            return ChessGame.TeamColor.BLACK;
-        }
-        else {
-            return null;
-        }
-    }
-
     private void resign(ResignCommand command, WebSocketConnection connection) throws Exception{
         GameData gameData = gameDAO.get(Integer.toString(command.getGameID()));
 
         if (gameData == null){
             throw new BadRequestException("Game with ID " + command.getGameID() + " does not exist");
         }
-        if (getPlayerTeam(connection.auth.username(), gameData) == null){
+        if (gameData.getPlayerTeam(connection.auth.username()) == null){
             throw new ForbiddenException("User is not playing in this game.");
         }
         if (gameData.game().isGameOver()){
@@ -188,7 +176,7 @@ public class WebSocketHandler {
         gameData.game().setGameOver(true);
         gameDAO.update(gameData);
 
-        connectionManager.broadcast(connection.auth.authToken(), gameData.gameID(),connection.auth.username() + " has resigned the game");
+        connectionManager.broadcast(null, gameData.gameID(),connection.auth.username() + " has resigned the game");
     }
 
 }
